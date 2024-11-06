@@ -1,5 +1,5 @@
 <template>
-  <div class="money-value-optimizer">
+  <div class="fire-tas">
     <h1>FIRE TAS</h1>
 
     <button class="toggle-button" @click="toggleAllSections">
@@ -237,7 +237,7 @@ export default defineComponent({
       this.isExpanded = savedExpandedState === "true";
     }
 
-    const savedData = localStorage.getItem("moneyValueOptimizerData");
+    const savedData = localStorage.getItem("fireTasData");
     if (savedData) {
       this.formData = JSON.parse(savedData);
     }
@@ -252,7 +252,7 @@ export default defineComponent({
     formData: {
       handler(newValue: FormData): void {
         localStorage.setItem(
-          "moneyValueOptimizerData",
+          "fireTasData",
           JSON.stringify(newValue)
         );
       },
@@ -278,7 +278,7 @@ export default defineComponent({
   background-color: #34495e;
 }
 
-.money-value-optimizer {
+.fire-tas {
   padding: 5px;
 }
 
