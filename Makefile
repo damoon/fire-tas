@@ -1,27 +1,27 @@
-# Money Value Optimizer Makefile
+.PHONY: install dev build preview clean lint help
 
-.PHONY: install serve build lint help
+help:
+	@echo "Available commands:"
+	@echo "  make install  - Install dependencies"
+	@echo "  make dev     - Start development server"
+	@echo "  make build   - Build for production"
+	@echo "  make preview - Preview production build"
+	@echo "  make clean   - Remove build artifacts and dependencies"
 
-# Install dependencies
 install:
 	npm install
 
-# Run development server with hot-reload
-serve:
-	npm run serve
+dev:
+	npm run dev
 
-# Build for production
 build:
 	npm run build
 
-# Lint and fix files
+preview:
+	npm run preview
+
+clean:
+	rm -rf dist node_modules
+
 lint:
 	npm run lint
-
-# Help target
-help:
-	@echo "Available commands:"
-	@echo "  make install  - Install project dependencies"
-	@echo "  make serve   - Start development server with hot-reload"
-	@echo "  make build   - Build for production"
-	@echo "  make lint    - Lint and fix files"
