@@ -5,7 +5,7 @@ import vue from "@vitejs/plugin-vue";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/fire-calculator/",
+  base: "/fire-tas/",
   plugins: [vue()],
   resolve: {
     alias: {

@@ -1,6 +1,6 @@
 <template>
   <div class="money-value-optimizer">
-    <h1>Money Value Optimizer</h1>
+    <h1>FIRE TAS</h1>
 
     <button class="toggle-button" @click="toggleAllSections">
       {{ isExpanded ? "Hide Input Fields" : "Show Input Fields" }}
@@ -170,11 +170,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import DataTable from './DataTable.vue';
+import DataTable from "./DataTable.vue";
 import type { FormData, Columns } from "@/types";
 
 export default defineComponent({
-  name: "MoneyValueOptimizer",
+  name: "FireTas",
   components: {
     DataTable,
   },
@@ -278,7 +278,6 @@ export default defineComponent({
   background-color: #34495e;
 }
 
-
 .money-value-optimizer {
   padding: 5px;
 }
@@ -325,5 +324,4 @@ h2 {
   margin-bottom: 10px;
   color: #2c3e50;
 }
-
 </style>

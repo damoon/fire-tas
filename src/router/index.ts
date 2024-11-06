@@ -1,11 +1,11 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import MoneyValueOptimizer from "@/components/MoneyValueOptimizer.vue";
+import FireTas from "@/components/FireTas.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "home",
-    component: MoneyValueOptimizer,
+    component: FireTas,
   },
 ];
 
