@@ -17,7 +17,7 @@ dev:
 build:
 	npm run build
 
-preview:
+preview: build
 	npm run preview
 
 clean:
