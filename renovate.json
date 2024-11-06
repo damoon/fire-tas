@@ -6,6 +6,5 @@
   "rebaseWhen": "conflicted",
   "automerge": true,
   "automergeType": "pr",
-  "requiredStatusChecks": ["test"],
   "platformAutomerge": true
 }
