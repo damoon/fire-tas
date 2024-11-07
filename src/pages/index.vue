@@ -1,5 +1,7 @@
 <template>
-	<FireTas />
+	<div>
+		<FireTas />
+	</div>
 </template>
 
 <script setup lang="ts">

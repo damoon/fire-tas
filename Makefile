@@ -22,6 +22,3 @@ preview: build
 
 clean:
 	rm -rf dist node_modules
-
-lint:
-	npm run lint
