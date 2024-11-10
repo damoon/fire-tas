@@ -27,7 +27,15 @@
           <td v-show="columns.ageA.visible">{{ row.ageA }}</td>
           <td v-show="columns.ageB.visible">{{ row.ageB }}</td>
           <td v-show="columns.inflationFactor.visible">
-            {{ row.inflationFactor.toFixed(4) }}
+            {{ row.inflationFactor.toFixed(2) }}
+          </td>
+          <td v-show="columns.expenses.visible">
+            {{
+              row.expenses.toLocaleString("de-DE", {
+                style: "currency",
+                currency: "EUR",
+              })
+            }}
           </td>
         </tr>
       </tbody>
@@ -57,6 +65,7 @@ export default defineComponent({
         ageA: { visible: true, label: "Alter A" },
         ageB: { visible: true, label: "Alter B" },
         inflationFactor: { visible: true, label: "Inflationsfaktor" },
+        expenses: { visible: true, label: "Ausgaben" },
       } as Columns,
     };
   },
@@ -92,6 +101,12 @@ export default defineComponent({
             1 + this.formData.general.inflation / 100,
             yearsSinceStart,
           ),
+          expenses:
+            this.formData.household.expenses *
+            Math.pow(
+              1 + this.formData.general.inflation / 100,
+              yearsSinceStart,
+            ),
         });
         index++;
       }
