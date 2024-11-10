@@ -44,6 +44,9 @@
           <td v-show="columns.grossPayout.visible">
             {{ formatCurrency(row.grossPayout) }}
           </td>
+          <td v-show="columns.netPayout.visible">
+            {{ formatCurrency(row.netPayout) }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -77,6 +80,7 @@ export default defineComponent({
         investment: { visible: true, label: "Investieren" },
         totalInvested: { visible: true, label: "Aktiendepot" },
         grossPayout: { visible: true, label: "Auszahlungen Brutto" },
+        netPayout: { visible: true, label: "Auszahlungen" },
       } as Columns,
     };
   },
@@ -129,6 +133,7 @@ export default defineComponent({
         const investment = income - expenses;
         const grossPayout =
           totalInvested * (this.formData.household.payoutRate / 100);
+        const netPayout = grossPayout * (1 - this.formData.general.returnTax / 100);
 
         totalInvested *= 1 + this.formData.general.expectedReturn / 100;
         totalInvested += investment;
@@ -143,6 +148,7 @@ export default defineComponent({
           investment,
           totalInvested,
           grossPayout,
+          netPayout,
         });
         index++;
       }
