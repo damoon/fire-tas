@@ -224,12 +224,6 @@ export default defineComponent({
           numberOfChildren: 1,
         },
       } as FormData,
-      columns: {
-        index: { visible: true, label: "#" },
-        year: { visible: true, label: "Year" },
-        ageA: { visible: true, label: "Age A" },
-        ageB: { visible: true, label: "Age B" },
-      } as Columns,
     };
   },
 
