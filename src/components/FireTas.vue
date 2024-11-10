@@ -164,9 +164,6 @@
       </section>
     </div>
 
-    <button v-if="isDevelopment" class="reset-button" @click="resetData">
-      Daten zurücksetzen
-    </button>
     <DataTable :form-data="formData" />
   </div>
 </template>
@@ -180,12 +177,6 @@ export default defineComponent({
   name: "FireTas",
   components: {
     DataTable,
-  },
-
-  computed: {
-    isDevelopment(): boolean {
-      return import.meta.env.DEV;
-    },
   },
 
   data() {
@@ -232,10 +223,6 @@ export default defineComponent({
       this.isExpanded = !this.isExpanded;
       localStorage.setItem("inputSectionsExpanded", String(this.isExpanded));
     },
-    resetData(): void {
-      localStorage.clear();
-      window.location.reload();
-    },
   },
 
   mounted(): void {
@@ -280,30 +267,6 @@ export default defineComponent({
 }
 .toggle-button:hover {
   background-color: #34495e;
-}
-.reset-button {
-  margin: 20px 0;
-  padding: 10px 20px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.reset-button:hover {
-  background-color: #c0392b;
-}
-.reset-button {
-  margin: 20px 0;
-  padding: 10px 20px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.reset-button:hover {
-  background-color: #c0392b;
 }
 
 .fire-tas {
