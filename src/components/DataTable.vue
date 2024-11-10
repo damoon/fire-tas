@@ -109,35 +109,30 @@ export default defineComponent({
       let index = 1;
 
       for (let year = currentYear; year <= maxYear; year++) {
+        const ageA = year - birthYearA;
+        const ageB = year - birthYearB;
         const yearsSinceStart = year - currentYear;
+        const inflationFactor = Math.pow(
+          1 + this.formData.general.inflation / 100,
+          yearsSinceStart,
+        );
+        const expenses = this.formData.household.expenses * inflationFactor;
+        const income =
+          (this.formData.personA.net +
+            this.formData.personB.net +
+            this.formData.household.numberOfChildren * 250 * 12) *
+          inflationFactor;
+        const investment = income - expenses;
+
         data.push({
           index,
           year,
-          ageA: year - birthYearA,
-          ageB: year - birthYearB,
-          inflationFactor: Math.pow(
-            1 + this.formData.general.inflation / 100,
-            yearsSinceStart,
-          ),
-          expenses:
-            this.formData.household.expenses *
-            Math.pow(
-              1 + this.formData.general.inflation / 100,
-              yearsSinceStart,
-            ),
-          income:
-            (this.formData.personA.net +
-              this.formData.personB.net +
-              this.formData.household.numberOfChildren * 250 * 12) *
-            Math.pow(
-              1 + this.formData.general.salaryIncrease / 100,
-              yearsSinceStart,
-            ),
-          investment:
-            this.formData.personA.net +
-            this.formData.personB.net +
-            this.formData.household.numberOfChildren * 250 * 12 -
-            this.formData.household.expenses,
+          ageA,
+          ageB,
+          inflationFactor,
+          expenses,
+          income,
+          investment,
         });
         index++;
       }
