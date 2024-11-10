@@ -112,12 +112,16 @@ export default defineComponent({
           1 + this.formData.general.inflation / 100,
           yearsSinceStart,
         );
+        const salaryIncreaseFactor = Math.pow(
+          1 + this.formData.general.salaryIncrease / 100,
+          yearsSinceStart,
+        );
         const expenses = this.formData.household.expenses * inflationFactor;
         const income =
           (this.formData.personA.net +
             this.formData.personB.net +
             this.formData.household.numberOfChildren * 250 * 12) *
-          inflationFactor;
+          salaryIncreaseFactor;
         const investment = income - expenses;
 
         totalInvested *= 1 + this.formData.general.expectedReturn / 100;
