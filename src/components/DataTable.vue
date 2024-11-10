@@ -45,6 +45,14 @@
               })
             }}
           </td>
+          <td v-show="columns.investment.visible">
+            {{
+              row.investment.toLocaleString("de-DE", {
+                style: "currency",
+                currency: "EUR",
+              })
+            }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -75,6 +83,7 @@ export default defineComponent({
         inflationFactor: { visible: true, label: "Inflationsfaktor" },
         expenses: { visible: true, label: "Ausgaben" },
         income: { visible: true, label: "Einkommen" },
+        investment: { visible: true, label: "Investieren" },
       } as Columns,
     };
   },
@@ -124,6 +133,11 @@ export default defineComponent({
               1 + this.formData.general.salaryIncrease / 100,
               yearsSinceStart,
             ),
+          investment:
+            this.formData.personA.net +
+            this.formData.personB.net +
+            this.formData.household.numberOfChildren * 250 * 12 -
+            this.formData.household.expenses,
         });
         index++;
       }

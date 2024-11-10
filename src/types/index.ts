@@ -48,4 +48,5 @@ export interface YearlyDataRow {
   inflationFactor: number;
   expenses: number;
   income: number;
+  investment: number;
 }
