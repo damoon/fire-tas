@@ -26,6 +26,9 @@
           <td v-show="columns.year.visible">{{ row.year }}</td>
           <td v-show="columns.ageA.visible">{{ row.ageA }}</td>
           <td v-show="columns.ageB.visible">{{ row.ageB }}</td>
+          <td v-show="columns.inflationFactor.visible">
+            {{ row.inflationFactor.toFixed(4) }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -53,6 +56,7 @@ export default defineComponent({
         year: { visible: true, label: "Jahr" },
         ageA: { visible: true, label: "Alter A" },
         ageB: { visible: true, label: "Alter B" },
+        inflationFactor: { visible: true, label: "Inflationsfaktor" },
       } as Columns,
     };
   },
@@ -78,11 +82,16 @@ export default defineComponent({
       let index = 1;
 
       for (let year = currentYear; year <= maxYear; year++) {
+        const yearsSinceStart = year - currentYear;
         data.push({
           index,
           year,
           ageA: year - birthYearA,
           ageB: year - birthYearB,
+          inflationFactor: Math.pow(
+            1 + this.formData.general.inflation / 100,
+            yearsSinceStart,
+          ),
         });
         index++;
       }

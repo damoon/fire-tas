@@ -45,4 +45,5 @@ export interface YearlyDataRow {
   year: number;
   ageA: number;
   ageB: number;
+  inflationFactor: number;
 }
