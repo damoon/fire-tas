@@ -30,36 +30,16 @@
             {{ row.inflationFactor.toFixed(2) }}
           </td>
           <td v-show="columns.expenses.visible">
-            {{
-              row.expenses.toLocaleString("de-DE", {
-                style: "currency",
-                currency: "EUR",
-              })
-            }}
+            {{ formatCurrency(row.expenses) }}
           </td>
           <td v-show="columns.income.visible">
-            {{
-              row.income.toLocaleString("de-DE", {
-                style: "currency",
-                currency: "EUR",
-              })
-            }}
+            {{ formatCurrency(row.income) }}
           </td>
           <td v-show="columns.investment.visible">
-            {{
-              row.investment.toLocaleString("de-DE", {
-                style: "currency",
-                currency: "EUR",
-              })
-            }}
+            {{ formatCurrency(row.investment) }}
           </td>
           <td v-show="columns.totalInvested.visible">
-            {{
-              row.totalInvested.toLocaleString("de-DE", {
-                style: "currency",
-                currency: "EUR",
-              })
-            }}
+            {{ formatCurrency(row.totalInvested) }}
           </td>
         </tr>
       </tbody>
@@ -103,6 +83,12 @@ export default defineComponent({
         this.columns[columnKey].visible = !this.columns[columnKey].visible;
         localStorage.setItem("tableColumnState", JSON.stringify(this.columns));
       }
+    },
+    formatCurrency(value: number): string {
+      return value.toLocaleString("de-DE", {
+        style: "currency",
+        currency: "EUR",
+      });
     },
   },
 
