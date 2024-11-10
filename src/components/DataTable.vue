@@ -53,6 +53,14 @@
               })
             }}
           </td>
+          <td v-show="columns.totalInvested.visible">
+            {{
+              row.totalInvested.toLocaleString("de-DE", {
+                style: "currency",
+                currency: "EUR",
+              })
+            }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -84,6 +92,7 @@ export default defineComponent({
         expenses: { visible: true, label: "Ausgaben" },
         income: { visible: true, label: "Einkommen" },
         investment: { visible: true, label: "Investieren" },
+        totalInvested: { visible: true, label: "Investiert" },
       } as Columns,
     };
   },
@@ -105,6 +114,7 @@ export default defineComponent({
 
       const maxYear = Math.max(birthYearA + 100, birthYearB + 100);
 
+      let totalInvested = 0;
       const data: YearlyDataRow[] = [];
       let index = 1;
 
@@ -124,6 +134,8 @@ export default defineComponent({
           inflationFactor;
         const investment = income - expenses;
 
+        totalInvested *= 1 + this.formData.general.expectedReturn / 100;
+        totalInvested += investment;
         data.push({
           index,
           year,
@@ -133,6 +145,7 @@ export default defineComponent({
           expenses,
           income,
           investment,
+          totalInvested,
         });
         index++;
       }

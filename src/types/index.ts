@@ -49,4 +49,5 @@ export interface YearlyDataRow {
   expenses: number;
   income: number;
   investment: number;
+  totalInvested: number;
 }
