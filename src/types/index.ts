@@ -22,6 +22,7 @@ export interface HouseholdData {
   desiredRetirementAge: number;
   payoutRate: number;
   numberOfChildren: number;
+  currentInvestments: number;
 }
 
 export interface FormData {

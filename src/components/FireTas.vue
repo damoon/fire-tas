@@ -154,6 +154,13 @@
           />
         </div>
         <div class="input-group">
+          <label>Aktiendepot</label>
+          <input
+            type="number"
+            v-model="formData.household.currentInvestments"
+          />
+        </div>
+        <div class="input-group">
           <label>Auszahlungsquote (%)</label>
           <input
             type="number"
@@ -213,6 +220,7 @@ export default defineComponent({
           desiredRetirementAge: 60,
           payoutRate: 2.7,
           numberOfChildren: 1,
+          currentInvestments: 50000,
         },
       } as FormData,
     };

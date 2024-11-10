@@ -72,7 +72,7 @@ export default defineComponent({
         expenses: { visible: true, label: "Ausgaben" },
         income: { visible: true, label: "Einkommen" },
         investment: { visible: true, label: "Investieren" },
-        totalInvested: { visible: true, label: "Investiert" },
+        totalInvested: { visible: true, label: "Aktiendepot" },
       } as Columns,
     };
   },
@@ -100,7 +100,7 @@ export default defineComponent({
 
       const maxYear = Math.max(birthYearA + 100, birthYearB + 100);
 
-      let totalInvested = 0;
+      let totalInvested = this.formData.household.currentInvestments;
       const data: YearlyDataRow[] = [];
       let index = 1;
 
