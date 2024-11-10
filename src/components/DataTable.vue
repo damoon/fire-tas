@@ -50,9 +50,9 @@ export default defineComponent({
     return {
       columns: {
         index: { visible: true, label: "#" },
-        year: { visible: true, label: "Year" },
-        ageA: { visible: true, label: "Age A" },
-        ageB: { visible: true, label: "Age B" },
+        year: { visible: true, label: "Jahr" },
+        ageA: { visible: true, label: "Alter A" },
+        ageB: { visible: true, label: "Alter B" },
       } as Columns,
     };
   },

@@ -3,13 +3,13 @@
     <h1>FIRE TAS</h1>
 
     <button class="toggle-button" @click="toggleAllSections">
-      {{ isExpanded ? "Hide Input Fields" : "Show Input Fields" }}
+      {{ isExpanded ? "Eingabefelder ausblenden" : "Eingabefelder anzeigen" }}
     </button>
 
     <div class="sections-container" v-show="isExpanded">
       <!-- General Section -->
       <section class="form-section">
-        <h2>General</h2>
+        <h2>Allgemein</h2>
         <div class="input-group">
           <label>Inflation (%)</label>
           <input
@@ -251,10 +251,7 @@ export default defineComponent({
   watch: {
     formData: {
       handler(newValue: FormData): void {
-        localStorage.setItem(
-          "fireTasData",
-          JSON.stringify(newValue)
-        );
+        localStorage.setItem("fireTasData", JSON.stringify(newValue));
       },
       deep: true,
     },

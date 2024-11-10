@@ -1,4 +1,3 @@
-
 export interface GeneralData {
   inflation: number;
   salaryIncrease: number;

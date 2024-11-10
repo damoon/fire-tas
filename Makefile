@@ -8,6 +8,9 @@ help:
 	@echo "  make preview - Preview production build"
 	@echo "  make clean   - Remove build artifacts and dependencies"
 
+format:
+	npm run format
+
 install:
 	npm install
 
