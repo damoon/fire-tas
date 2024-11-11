@@ -130,13 +130,18 @@ export default defineComponent({
             this.formData.personB.net +
             this.formData.household.numberOfChildren * 250 * 12) *
           salaryIncreaseFactor;
-        const investment = income - expenses;
         const grossPayout =
           totalInvested * (this.formData.household.payoutRate / 100);
-        const netPayout = grossPayout * (1 - this.formData.general.returnTax / 100);
+        const netPayout =
+          grossPayout * (1 - this.formData.general.returnTax / 100);
 
-        totalInvested *= 1 + this.formData.general.expectedReturn / 100;
-        totalInvested += investment;
+        const currentMonth = new Date().getMonth() + 1;
+        const remainingYearFactor = (12 - currentMonth) / 12;
+        let investment = income - expenses;
+        if (index === 1) {
+          investment = investment * remainingYearFactor;
+        }
+
         data.push({
           index,
           year,
@@ -150,6 +155,14 @@ export default defineComponent({
           grossPayout,
           netPayout,
         });
+
+        let investmentReturn =
+          (totalInvested * this.formData.general.expectedReturn) / 100;
+        if (index === 1) {
+          investmentReturn = investmentReturn * remainingYearFactor;
+        }
+        totalInvested += investment + investmentReturn;
+
         index++;
       }
 
