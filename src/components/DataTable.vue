@@ -29,11 +29,14 @@
           <td v-show="columns.inflationFactor.visible">
             {{ row.inflationFactor.toFixed(2) }}
           </td>
+          <td v-show="columns.salaryIncreaseFactor.visible">
+            {{ row.salaryIncreaseFactor.toFixed(2) }}
+          </td>
           <td v-show="columns.expenses.visible">
             {{ formatCurrency(row.expenses) }}
           </td>
-          <td v-show="columns.income.visible">
-            {{ formatCurrency(row.income) }}
+          <td v-show="columns.earnings.visible">
+            {{ formatCurrency(row.earnings) }}
           </td>
           <td v-show="columns.investment.visible">
             {{ formatCurrency(row.investment) }}
@@ -47,6 +50,45 @@
           <td v-show="columns.netPayout.visible">
             {{ formatCurrency(row.netPayout) }}
           </td>
+          <td v-show="columns.medianSalary.visible">
+            {{ formatCurrency(row.medianSalary) }}
+          </td>
+          <td v-show="columns.grossA.visible">
+            {{ formatCurrency(row.grossA) }}
+          </td>
+          <td v-show="columns.grossB.visible">
+            {{ formatCurrency(row.grossB) }}
+          </td>
+          <td v-show="columns.retirementPointsA.visible">
+            {{ row.retirementPointsA.toFixed(2) }}
+          </td>
+          <td v-show="columns.retirementPointsB.visible">
+            {{ row.retirementPointsB.toFixed(2) }}
+          </td>
+          <td v-show="columns.retirementPoints.visible">
+            {{ row.retirementPoints.toFixed(2) }}
+          </td>
+          <td v-show="columns.retirementPointsTotalA.visible">
+            {{ row.retirementPointsTotalA.toFixed(2) }}
+          </td>
+          <td v-show="columns.retirementPointsTotalB.visible">
+            {{ row.retirementPointsTotalB.toFixed(2) }}
+          </td>
+          <td v-show="columns.retirementPointsTotal.visible">
+            {{ row.retirementPointsTotal.toFixed(2) }}
+          </td>
+          <td v-show="columns.retirementPointValue.visible">
+            {{ formatCurrency(row.retirementPointValue) }}
+          </td>
+          <td v-show="columns.retirementGross.visible">
+            {{ formatCurrency(row.retirementGross) }}
+          </td>
+          <td v-show="columns.retirementNet.visible">
+            {{ formatCurrency(row.retirementNet) }}
+          </td>
+          <td v-show="columns.income.visible">
+            {{ formatCurrency(row.income) }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -56,6 +98,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { FormData, Columns, YearlyDataRow } from "@/types";
+import { calculateTaxableRate, grossToNetRetired } from "./taxes";
 
 export default defineComponent({
   name: "DataTable",
@@ -75,12 +118,32 @@ export default defineComponent({
         ageA: { visible: true, label: "Alter A" },
         ageB: { visible: true, label: "Alter B" },
         inflationFactor: { visible: true, label: "Inflationsfaktor" },
+        salaryIncreaseFactor: { visible: true, label: "Einkommensfaktor" },
         expenses: { visible: true, label: "Ausgaben" },
-        income: { visible: true, label: "Einkommen" },
+        earnings: { visible: true, label: "Einkommen" },
         investment: { visible: true, label: "Investieren" },
         totalInvested: { visible: true, label: "Aktiendepot" },
         grossPayout: { visible: true, label: "Auszahlungen Brutto" },
         netPayout: { visible: true, label: "Auszahlungen" },
+        medianSalary: { visible: true, label: "Mediangehalt" },
+        grossA: { visible: true, label: "Brutto A" },
+        grossB: { visible: true, label: "Brutto B" },
+        retirementPointsA: { visible: true, label: "Rentenpunkte A" },
+        retirementPointsB: { visible: true, label: "Rentenpunkte B" },
+        retirementPoints: { visible: true, label: "Rentenpunkte" },
+        retirementPointsTotalA: {
+          visible: true,
+          label: "Rentenpunkte Gesamt A",
+        },
+        retirementPointsTotalB: {
+          visible: true,
+          label: "Rentenpunkte Gesamt B",
+        },
+        retirementPointsTotal: { visible: true, label: "Rentenpunkte Gesamt" },
+        retirementPointValue: { visible: true, label: "Rentenpunktewert" },
+        retirementGross: { visible: true, label: "Altersrente Brutto" },
+        retirementNet: { visible: true, label: "Altersrente Netto" },
+        income: { visible: true, label: "Einnahmen" },
       } as Columns,
     };
   },
@@ -107,10 +170,18 @@ export default defineComponent({
       const birthYearB = this.formData.personB.birthYear;
 
       const maxYear = Math.max(birthYearA + 100, birthYearB + 100);
+      const retirementYear = Math.min(
+        birthYearA + this.formData.general.retirementAge,
+        birthYearB + this.formData.general.retirementAge
+      );
+      const taxableRate = calculateTaxableRate(retirementYear);
 
       let totalInvested = this.formData.household.currentInvestments;
       const data: YearlyDataRow[] = [];
       let index = 1;
+
+      let retirementPointsTotalA = this.formData.personA.pensionPoints;
+      let retirementPointsTotalB = this.formData.personA.pensionPoints;
 
       for (let year = currentYear; year <= maxYear; year++) {
         const ageA = year - birthYearA;
@@ -118,14 +189,14 @@ export default defineComponent({
         const yearsSinceStart = year - currentYear;
         const inflationFactor = Math.pow(
           1 + this.formData.general.inflation / 100,
-          yearsSinceStart,
+          yearsSinceStart
         );
         const salaryIncreaseFactor = Math.pow(
           1 + this.formData.general.salaryIncrease / 100,
-          yearsSinceStart,
+          yearsSinceStart
         );
         const expenses = this.formData.household.expenses * inflationFactor;
-        const income =
+        const earnings =
           (this.formData.personA.net +
             this.formData.personB.net +
             this.formData.household.numberOfChildren * 250 * 12) *
@@ -137,10 +208,30 @@ export default defineComponent({
 
         const currentMonth = new Date().getMonth() + 1;
         const remainingYearFactor = (12 - currentMonth) / 12;
-        let investment = income - expenses;
+        let investment = earnings - expenses;
         if (index === 1) {
           investment = investment * remainingYearFactor;
         }
+
+        const medianSalary =
+          this.formData.general.medianSalary * salaryIncreaseFactor;
+        const grossA = this.formData.personA.gross * salaryIncreaseFactor;
+        const grossB = this.formData.personB.gross * salaryIncreaseFactor;
+
+        const retirementPointsA = grossA / medianSalary;
+        const retirementPointsB = grossB / medianSalary;
+        const retirementPoints = retirementPointsA + retirementPointsB;
+        const retirementPointsTotal =
+          retirementPointsTotalA + retirementPointsTotalB;
+        const retirementPointValue =
+          this.formData.general.pensionPointValue * salaryIncreaseFactor;
+        const retirementGross =
+          retirementPointValue * retirementPointsTotal * 12;
+        const retirementNet = grossToNetRetired(
+          retirementGross,
+          taxableRate
+        ).netPension;
+        const income = netPayout + retirementNet;
 
         data.push({
           index,
@@ -148,12 +239,26 @@ export default defineComponent({
           ageA,
           ageB,
           inflationFactor,
+          salaryIncreaseFactor,
           expenses,
-          income,
+          earnings,
           investment,
           totalInvested,
           grossPayout,
           netPayout,
+          medianSalary,
+          grossA,
+          grossB,
+          retirementPointsA,
+          retirementPointsB,
+          retirementPoints,
+          retirementPointsTotalA,
+          retirementPointsTotalB,
+          retirementPointsTotal,
+          retirementPointValue,
+          retirementGross,
+          retirementNet,
+          income,
         });
 
         let investmentReturn =
@@ -162,6 +267,9 @@ export default defineComponent({
           investmentReturn = investmentReturn * remainingYearFactor;
         }
         totalInvested += investment + investmentReturn;
+
+        retirementPointsTotalA += retirementPointsA;
+        retirementPointsTotalB += retirementPointsB;
 
         index++;
       }

@@ -47,10 +47,24 @@ export interface YearlyDataRow {
   ageA: number;
   ageB: number;
   inflationFactor: number;
+  salaryIncreaseFactor: number;
   expenses: number;
-  income: number;
+  earnings: number;
   investment: number;
   totalInvested: number;
   grossPayout: number;
   netPayout: number;
+  medianSalary: number;
+  grossA: number;
+  grossB: number;
+  retirementPointsA: number;
+  retirementPointsB: number;
+  retirementPoints: number;
+  retirementPointsTotalA: number;
+  retirementPointsTotalB: number;
+  retirementPointsTotal: number;
+  retirementPointValue: number;
+  retirementGross: number;
+  retirementNet: number;
+  income: number;
 }
