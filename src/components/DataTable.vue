@@ -1,4 +1,14 @@
 <template>
+  <div class="view-toggles">
+    <button
+      v-for="view in views"
+      :key="view.name"
+      @click="activateView(view.name)"
+      :class="{ active: currentView === view.name }"
+    >
+      {{ view.name }}
+    </button>
+  </div>
   <div class="table-container">
     <div class="column-toggles">
       <button
@@ -123,6 +133,64 @@ export default defineComponent({
 
   data() {
     return {
+      currentView: "Zeit",
+      views: [
+        { name: "Zeit", columns: ["index", "year", "ageA", "ageB"] },
+        {
+          name: "Faktoren",
+          columns: [
+            "index",
+            "year",
+            "inflationFactor",
+            "medianSalaryIncreaseFactor",
+            "salaryIncreaseFactor",
+          ],
+        },
+        {
+          name: "Investieren",
+          columns: [
+            "earnings",
+            "investment",
+            "totalInvested",
+            "grossPayout",
+            "netPayout",
+          ],
+        },
+        {
+          name: "Rentenpunkte",
+          columns: [
+            "medianSalary",
+            "grossA",
+            "grossB",
+            "retirementPointsA",
+            "retirementPointsB",
+            "retirementPoints",
+            "retirementPointsTotalA",
+            "retirementPointsTotalB",
+            "retirementPointsTotal",
+          ],
+        },
+        {
+          name: "Altersrente",
+          columns: [
+            "retirementPointsTotal",
+            "retirementPointValue",
+            "retirementGross",
+            "retirementNet",
+          ],
+        },
+        {
+          name: "Cashflow",
+          columns: [
+            "year",
+            "earnings",
+            "netPayout",
+            "retirementNet",
+            "income",
+            "expenses",
+          ],
+        },
+      ],
       columnVisibility: {
         index: true,
         year: true,
@@ -155,6 +223,20 @@ export default defineComponent({
   },
 
   methods: {
+    activateView(viewName: string): void {
+      const view = this.views.find((v) => v.name === viewName);
+      if (view) {
+        this.currentView = viewName;
+        Object.keys(this.columnVisibility).forEach((key) => {
+          this.columnVisibility[key] = view.columns.includes(key);
+        });
+        localStorage.setItem(
+          "tableColumnVisibility",
+          JSON.stringify(this.columnVisibility),
+        );
+        localStorage.setItem("tableViewName", viewName);
+      }
+    },
     toggleColumn(columnKey: string): void {
       if (this.columnVisibility[columnKey] !== undefined) {
         this.columnVisibility[columnKey] = !this.columnVisibility[columnKey];
@@ -437,6 +519,10 @@ export default defineComponent({
   },
 
   mounted() {
+    const savedView = localStorage.getItem("tableViewName");
+    if (savedView) {
+      this.currentView = savedView;
+    }
     const savedVisibility = localStorage.getItem("tableColumnVisibility");
     if (savedVisibility) {
       this.columnVisibility = {
@@ -449,6 +535,27 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.view-toggles {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.view-toggles button {
+  padding: 8px 16px;
+  border: 1px solid #2c3e50;
+  background-color: white;
+  color: #2c3e50;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.view-toggles button.active {
+  background-color: #2c3e50;
+  color: white;
+}
+
 .table-container {
   margin-top: 20px;
   overflow-x: auto;
