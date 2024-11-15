@@ -20,6 +20,15 @@
           />
         </div>
         <div class="input-group">
+          <label>Mediangehaltssteigerung (%)</label>
+          <input
+            type="number"
+            v-model="formData.general.medianSalaryIncrease"
+            step="0.1"
+            min="0"
+          />
+        </div>
+        <div class="input-group">
           <label>Gehaltssteigerung (%)</label>
           <input
             type="number"
@@ -147,11 +156,12 @@
           <input type="number" v-model="formData.household.expenses" />
         </div>
         <div class="input-group">
-          <label>Rentenwunschalter</label>
-          <input
-            type="number"
-            v-model="formData.household.desiredRetirementAge"
-          />
+          <label>Coast Fire</label>
+          <input type="number" v-model="formData.household.coastAge" />
+        </div>
+        <div class="input-group">
+          <label>Fire</label>
+          <input type="number" v-model="formData.household.fireAge" />
         </div>
         <div class="input-group">
           <label>Aktiendepot</label>
@@ -165,6 +175,14 @@
           <input
             type="number"
             v-model="formData.household.payoutRate"
+            step="0.1"
+          />
+        </div>
+        <div class="input-group">
+          <label>Sequence of returns risk premium (%)</label>
+          <input
+            type="number"
+            v-model="formData.household.sequenceOrReturnRiskPremium"
             step="0.1"
           />
         </div>
@@ -192,7 +210,8 @@ export default defineComponent({
       formData: {
         general: {
           inflation: 3.0,
-          salaryIncrease: 2.0,
+          salaryIncrease: 1.0,
+          medianSalaryIncrease: 2.0,
           medianSalary: 43142,
           pensionPointValue: 39.32,
           retirementAge: 67,
@@ -217,8 +236,10 @@ export default defineComponent({
         },
         household: {
           expenses: 36000,
-          desiredRetirementAge: 60,
+          coastAge: 50,
+          fireAge: 60,
           payoutRate: 2.7,
+          sequenceOrReturnRiskPremium: 2.7,
           numberOfChildren: 1,
           currentInvestments: 50000,
         },
@@ -242,11 +263,6 @@ export default defineComponent({
     const savedData = localStorage.getItem("fireTasData");
     if (savedData) {
       this.formData = JSON.parse(savedData);
-    }
-
-    const savedColumnState = localStorage.getItem("tableColumnState");
-    if (savedColumnState) {
-      this.columns = JSON.parse(savedColumnState);
     }
   },
 

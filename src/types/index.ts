@@ -2,6 +2,7 @@ export interface GeneralData {
   inflation: number;
   salaryIncrease: number;
   medianSalary: number;
+  medianSalaryIncrease: number;
   pensionPointValue: number;
   retirementAge: number;
   expectedReturn: number;
@@ -19,8 +20,10 @@ export interface PersonData {
 
 export interface HouseholdData {
   expenses: number;
-  desiredRetirementAge: number;
+  coastAge: number;
+  fireAge: number;
   payoutRate: number;
+  sequenceOrReturnRiskPremium: number;
   numberOfChildren: number;
   currentInvestments: number;
 }
@@ -47,6 +50,7 @@ export interface YearlyDataRow {
   ageA: number;
   ageB: number;
   inflationFactor: number;
+  medianSalaryIncreaseFactor: number;
   salaryIncreaseFactor: number;
   expenses: number;
   earnings: number;

@@ -21,7 +21,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in yearlyData" :key="row.year">
+        <tr
+          v-for="row in yearlyData.filter((row) => row.year > 2000)"
+          :key="row.year"
+        >
           <td v-show="columns.index.visible">{{ row.index }}</td>
           <td v-show="columns.year.visible">{{ row.year }}</td>
           <td v-show="columns.ageA.visible">{{ row.ageA }}</td>
@@ -29,11 +32,11 @@
           <td v-show="columns.inflationFactor.visible">
             {{ row.inflationFactor.toFixed(2) }}
           </td>
+          <td v-show="columns.medianSalaryIncreaseFactor.visible">
+            {{ row.medianSalaryIncreaseFactor.toFixed(2) }}
+          </td>
           <td v-show="columns.salaryIncreaseFactor.visible">
             {{ row.salaryIncreaseFactor.toFixed(2) }}
-          </td>
-          <td v-show="columns.expenses.visible">
-            {{ formatCurrency(row.expenses) }}
           </td>
           <td v-show="columns.earnings.visible">
             {{ formatCurrency(row.earnings) }}
@@ -89,6 +92,9 @@
           <td v-show="columns.income.visible">
             {{ formatCurrency(row.income) }}
           </td>
+          <td v-show="columns.expenses.visible">
+            {{ formatCurrency(row.expenses) }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -118,8 +124,14 @@ export default defineComponent({
         ageA: { visible: true, label: "Alter A" },
         ageB: { visible: true, label: "Alter B" },
         inflationFactor: { visible: true, label: "Inflationsfaktor" },
-        salaryIncreaseFactor: { visible: true, label: "Einkommensfaktor" },
-        expenses: { visible: true, label: "Ausgaben" },
+        medianSalaryIncreaseFactor: {
+          visible: true,
+          label: "Medianeinkommensfaktor",
+        },
+        salaryIncreaseFactor: {
+          visible: true,
+          label: "Einkommensfaktor",
+        },
         earnings: { visible: true, label: "Einkommen" },
         investment: { visible: true, label: "Investieren" },
         totalInvested: { visible: true, label: "Aktiendepot" },
@@ -139,11 +151,18 @@ export default defineComponent({
           visible: true,
           label: "Rentenpunkte Gesamt B",
         },
-        retirementPointsTotal: { visible: true, label: "Rentenpunkte Gesamt" },
-        retirementPointValue: { visible: true, label: "Rentenpunktewert" },
+        retirementPointsTotal: {
+          visible: true,
+          label: "Rentenpunkte Gesamt",
+        },
+        retirementPointValue: {
+          visible: true,
+          label: "Rentenpunktewert",
+        },
         retirementGross: { visible: true, label: "Altersrente Brutto" },
         retirementNet: { visible: true, label: "Altersrente Netto" },
         income: { visible: true, label: "Einnahmen" },
+        expenses: { visible: true, label: "Ausgaben" },
       } as Columns,
     };
   },
@@ -168,12 +187,24 @@ export default defineComponent({
       const currentYear = new Date().getFullYear();
       const birthYearA = this.formData.personA.birthYear;
       const birthYearB = this.formData.personB.birthYear;
+      const retirementAge = this.formData.general.retirementAge;
 
       const maxYear = Math.max(birthYearA + 100, birthYearB + 100);
+      const coastYear = Math.min(
+        birthYearA + this.formData.household.coastAge,
+        birthYearB + this.formData.household.coastAge
+      );
+      let fireYear = Math.min(
+        birthYearA + this.formData.household.fireAge,
+        birthYearB + this.formData.household.fireAge
+      );
       const retirementYear = Math.min(
         birthYearA + this.formData.general.retirementAge,
         birthYearB + this.formData.general.retirementAge
       );
+      if (fireYear > retirementYear) {
+        fireYear = retirementYear;
+      }
       const taxableRate = calculateTaxableRate(retirementYear);
 
       let totalInvested = this.formData.household.currentInvestments;
@@ -181,7 +212,7 @@ export default defineComponent({
       let index = 1;
 
       let retirementPointsTotalA = this.formData.personA.pensionPoints;
-      let retirementPointsTotalB = this.formData.personA.pensionPoints;
+      let retirementPointsTotalB = this.formData.personB.pensionPoints;
 
       for (let year = currentYear; year <= maxYear; year++) {
         const ageA = year - birthYearA;
@@ -195,43 +226,83 @@ export default defineComponent({
           1 + this.formData.general.salaryIncrease / 100,
           yearsSinceStart
         );
+        const medianSalaryIncreaseFactor = Math.pow(
+          1 + this.formData.general.medianSalaryIncrease / 100,
+          yearsSinceStart
+        );
+
+        let earnings = 0;
+        if (fireYear > year) {
+          earnings =
+            (this.formData.personA.net +
+              this.formData.personB.net +
+              this.formData.household.numberOfChildren * 250 * 12) *
+            salaryIncreaseFactor;
+        }
+
         const expenses = this.formData.household.expenses * inflationFactor;
-        const earnings =
-          (this.formData.personA.net +
-            this.formData.personB.net +
-            this.formData.household.numberOfChildren * 250 * 12) *
-          salaryIncreaseFactor;
-        const grossPayout =
-          totalInvested * (this.formData.household.payoutRate / 100);
-        const netPayout =
-          grossPayout * (1 - this.formData.general.returnTax / 100);
+
+        let grossPayout = 0;
+        let netPayout = 0;
+        if (fireYear <= year) {
+          grossPayout =
+            totalInvested * (this.formData.household.payoutRate / 100);
+          netPayout = grossPayout * (1 - this.formData.general.returnTax / 100);
+          let reduction = 0;
+          reduction +=
+            totalInvested * (this.formData.household.payoutRate / 100);
+          reduction +=
+            totalInvested *
+            (this.formData.household.sequenceOrReturnRiskPremium / 100);
+          totalInvested -= reduction;
+        }
 
         const currentMonth = new Date().getMonth() + 1;
         const remainingYearFactor = (12 - currentMonth) / 12;
         let investment = earnings - expenses;
-        if (index === 1) {
-          investment = investment * remainingYearFactor;
+        // if (index === 1) {
+        //	investment = investment * remainingYearFactor;
+        //}
+        if (year >= coastYear) {
+          investment = 0;
         }
 
         const medianSalary =
-          this.formData.general.medianSalary * salaryIncreaseFactor;
-        const grossA = this.formData.personA.gross * salaryIncreaseFactor;
-        const grossB = this.formData.personB.gross * salaryIncreaseFactor;
+          this.formData.general.medianSalary * medianSalaryIncreaseFactor;
+
+        let grossA = this.formData.personA.gross * salaryIncreaseFactor;
+        if (ageA >= retirementAge) {
+          grossA = 0;
+        }
+        let grossB = this.formData.personB.gross * salaryIncreaseFactor;
+        if (ageB >= retirementAge) {
+          grossB = 0;
+        }
 
         const retirementPointsA = grossA / medianSalary;
         const retirementPointsB = grossB / medianSalary;
         const retirementPoints = retirementPointsA + retirementPointsB;
+
+        retirementPointsTotalA += retirementPointsA;
+        retirementPointsTotalB += retirementPointsB;
         const retirementPointsTotal =
           retirementPointsTotalA + retirementPointsTotalB;
+
         const retirementPointValue =
-          this.formData.general.pensionPointValue * salaryIncreaseFactor;
-        const retirementGross =
-          retirementPointValue * retirementPointsTotal * 12;
+          this.formData.general.pensionPointValue * medianSalaryIncreaseFactor;
+        let retirementGross = 0;
+        if (ageA >= retirementAge) {
+          retirementGross += retirementPointValue * retirementPointsTotalA * 12;
+        }
+        if (ageB >= retirementAge) {
+          retirementGross += retirementPointValue * retirementPointsTotalB * 12;
+        }
         const retirementNet = grossToNetRetired(
           retirementGross,
           taxableRate
         ).netPension;
-        const income = netPayout + retirementNet;
+
+        const income = netPayout + retirementNet + earnings - investment;
 
         data.push({
           index,
@@ -239,6 +310,7 @@ export default defineComponent({
           ageA,
           ageB,
           inflationFactor,
+          medianSalaryIncreaseFactor,
           salaryIncreaseFactor,
           expenses,
           earnings,
@@ -268,9 +340,6 @@ export default defineComponent({
         }
         totalInvested += investment + investmentReturn;
 
-        retirementPointsTotalA += retirementPointsA;
-        retirementPointsTotalB += retirementPointsB;
-
         index++;
       }
 
@@ -281,7 +350,8 @@ export default defineComponent({
   mounted() {
     const savedColumnState = localStorage.getItem("tableColumnState");
     if (savedColumnState) {
-      this.columns = JSON.parse(savedColumnState);
+      const savedColumns = JSON.parse(savedColumnState);
+      this.columns = { ...this.columns, ...savedColumns };
     }
   },
 });
