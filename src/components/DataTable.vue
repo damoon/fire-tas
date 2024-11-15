@@ -103,7 +103,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import type { FormData, Columns, YearlyDataRow } from "@/types";
+import type {
+  FormData,
+  Columns,
+  YearlyDataRow,
+  ColumnVisibility,
+} from "@/types";
 import { calculateTaxableRate, grossToNetRetired } from "./taxes";
 
 export default defineComponent({
@@ -118,60 +123,45 @@ export default defineComponent({
 
   data() {
     return {
-      columns: {
-        index: { visible: true, label: "#" },
-        year: { visible: true, label: "Jahr" },
-        ageA: { visible: true, label: "Alter A" },
-        ageB: { visible: true, label: "Alter B" },
-        inflationFactor: { visible: true, label: "Inflationsfaktor" },
-        medianSalaryIncreaseFactor: {
-          visible: true,
-          label: "Medianeinkommensfaktor",
-        },
-        salaryIncreaseFactor: {
-          visible: true,
-          label: "Einkommensfaktor",
-        },
-        earnings: { visible: true, label: "Einkommen" },
-        investment: { visible: true, label: "Investieren" },
-        totalInvested: { visible: true, label: "Aktiendepot" },
-        grossPayout: { visible: true, label: "Auszahlungen Brutto" },
-        netPayout: { visible: true, label: "Auszahlungen" },
-        medianSalary: { visible: true, label: "Mediangehalt" },
-        grossA: { visible: true, label: "Brutto A" },
-        grossB: { visible: true, label: "Brutto B" },
-        retirementPointsA: { visible: true, label: "Rentenpunkte A" },
-        retirementPointsB: { visible: true, label: "Rentenpunkte B" },
-        retirementPoints: { visible: true, label: "Rentenpunkte" },
-        retirementPointsTotalA: {
-          visible: true,
-          label: "Rentenpunkte Gesamt A",
-        },
-        retirementPointsTotalB: {
-          visible: true,
-          label: "Rentenpunkte Gesamt B",
-        },
-        retirementPointsTotal: {
-          visible: true,
-          label: "Rentenpunkte Gesamt",
-        },
-        retirementPointValue: {
-          visible: true,
-          label: "Rentenpunktewert",
-        },
-        retirementGross: { visible: true, label: "Altersrente Brutto" },
-        retirementNet: { visible: true, label: "Altersrente Netto" },
-        income: { visible: true, label: "Einnahmen" },
-        expenses: { visible: true, label: "Ausgaben" },
-      } as Columns,
+      columnVisibility: {
+        index: true,
+        year: true,
+        ageA: true,
+        ageB: true,
+        inflationFactor: true,
+        medianSalaryIncreaseFactor: true,
+        salaryIncreaseFactor: true,
+        earnings: true,
+        investment: true,
+        totalInvested: true,
+        grossPayout: true,
+        netPayout: true,
+        medianSalary: true,
+        grossA: true,
+        grossB: true,
+        retirementPointsA: true,
+        retirementPointsB: true,
+        retirementPoints: true,
+        retirementPointsTotalA: true,
+        retirementPointsTotalB: true,
+        retirementPointsTotal: true,
+        retirementPointValue: true,
+        retirementGross: true,
+        retirementNet: true,
+        income: true,
+        expenses: true,
+      } as ColumnVisibility,
     };
   },
 
   methods: {
     toggleColumn(columnKey: string): void {
-      if (this.columns[columnKey]) {
-        this.columns[columnKey].visible = !this.columns[columnKey].visible;
-        localStorage.setItem("tableColumnState", JSON.stringify(this.columns));
+      if (this.columnVisibility[columnKey] !== undefined) {
+        this.columnVisibility[columnKey] = !this.columnVisibility[columnKey];
+        localStorage.setItem(
+          "tableColumnVisibility",
+          JSON.stringify(this.columnVisibility),
+        );
       }
     },
     formatCurrency(value: number): string {
@@ -183,6 +173,105 @@ export default defineComponent({
   },
 
   computed: {
+    columns(): Columns {
+      return {
+        index: { visible: this.columnVisibility.index, label: "#" },
+        year: { visible: this.columnVisibility.year, label: "Jahr" },
+        ageA: {
+          visible: this.columnVisibility.ageA,
+          label: "Alter " + this.formData.personA.name,
+        },
+        ageB: {
+          visible: this.columnVisibility.ageB,
+          label: "Alter " + this.formData.personB.name,
+        },
+        inflationFactor: {
+          visible: this.columnVisibility.inflationFactor,
+          label: "Inflationsfaktor",
+        },
+        medianSalaryIncreaseFactor: {
+          visible: this.columnVisibility.medianSalaryIncreaseFactor,
+          label: "Medianeinkommensfaktor",
+        },
+        salaryIncreaseFactor: {
+          visible: this.columnVisibility.salaryIncreaseFactor,
+          label: "Einkommensfaktor",
+        },
+        earnings: {
+          visible: this.columnVisibility.earnings,
+          label: "Einkommen",
+        },
+        investment: {
+          visible: this.columnVisibility.investment,
+          label: "Investieren",
+        },
+        totalInvested: {
+          visible: this.columnVisibility.totalInvested,
+          label: "Aktiendepot",
+        },
+        grossPayout: {
+          visible: this.columnVisibility.grossPayout,
+          label: "Auszahlungen Brutto",
+        },
+        netPayout: {
+          visible: this.columnVisibility.netPayout,
+          label: "Auszahlungen",
+        },
+        medianSalary: {
+          visible: this.columnVisibility.medianSalary,
+          label: "Mediangehalt",
+        },
+        grossA: {
+          visible: this.columnVisibility.grossA,
+          label: "Brutto " + this.formData.personA.name,
+        },
+        grossB: {
+          visible: this.columnVisibility.grossB,
+          label: "Brutto " + this.formData.personB.name,
+        },
+        retirementPointsA: {
+          visible: this.columnVisibility.retirementPointsA,
+          label: "Rentenpunkte " + this.formData.personA.name,
+        },
+        retirementPointsB: {
+          visible: this.columnVisibility.retirementPointsB,
+          label: "Rentenpunkte " + this.formData.personB.name,
+        },
+        retirementPoints: {
+          visible: this.columnVisibility.retirementPoints,
+          label: "Rentenpunkte",
+        },
+        retirementPointsTotalA: {
+          visible: this.columnVisibility.retirementPointsTotalA,
+          label: "Rentenpunkte Gesamt " + this.formData.personA.name,
+        },
+        retirementPointsTotalB: {
+          visible: this.columnVisibility.retirementPointsTotalB,
+          label: "Rentenpunkte Gesamt " + this.formData.personB.name,
+        },
+        retirementPointsTotal: {
+          visible: this.columnVisibility.retirementPointsTotal,
+          label: "Rentenpunkte Gesamt",
+        },
+        retirementPointValue: {
+          visible: this.columnVisibility.retirementPointValue,
+          label: "Rentenpunktewert",
+        },
+        retirementGross: {
+          visible: this.columnVisibility.retirementGross,
+          label: "Altersrente Brutto",
+        },
+        retirementNet: {
+          visible: this.columnVisibility.retirementNet,
+          label: "Altersrente Netto",
+        },
+        income: { visible: this.columnVisibility.income, label: "Einnahmen" },
+        expenses: {
+          visible: this.columnVisibility.expenses,
+          label: "Ausgaben",
+        },
+      };
+    },
     yearlyData(): YearlyDataRow[] {
       const currentYear = new Date().getFullYear();
       const birthYearA = this.formData.personA.birthYear;
@@ -192,15 +281,15 @@ export default defineComponent({
       const maxYear = Math.max(birthYearA + 100, birthYearB + 100);
       const coastYear = Math.min(
         birthYearA + this.formData.household.coastAge,
-        birthYearB + this.formData.household.coastAge
+        birthYearB + this.formData.household.coastAge,
       );
       let fireYear = Math.min(
         birthYearA + this.formData.household.fireAge,
-        birthYearB + this.formData.household.fireAge
+        birthYearB + this.formData.household.fireAge,
       );
       const retirementYear = Math.min(
         birthYearA + this.formData.general.retirementAge,
-        birthYearB + this.formData.general.retirementAge
+        birthYearB + this.formData.general.retirementAge,
       );
       if (fireYear > retirementYear) {
         fireYear = retirementYear;
@@ -220,15 +309,15 @@ export default defineComponent({
         const yearsSinceStart = year - currentYear;
         const inflationFactor = Math.pow(
           1 + this.formData.general.inflation / 100,
-          yearsSinceStart
+          yearsSinceStart,
         );
         const salaryIncreaseFactor = Math.pow(
           1 + this.formData.general.salaryIncrease / 100,
-          yearsSinceStart
+          yearsSinceStart,
         );
         const medianSalaryIncreaseFactor = Math.pow(
           1 + this.formData.general.medianSalaryIncrease / 100,
-          yearsSinceStart
+          yearsSinceStart,
         );
 
         let earnings = 0;
@@ -299,7 +388,7 @@ export default defineComponent({
         }
         const retirementNet = grossToNetRetired(
           retirementGross,
-          taxableRate
+          taxableRate,
         ).netPension;
 
         const income = netPayout + retirementNet + earnings - investment;
@@ -348,10 +437,12 @@ export default defineComponent({
   },
 
   mounted() {
-    const savedColumnState = localStorage.getItem("tableColumnState");
-    if (savedColumnState) {
-      const savedColumns = JSON.parse(savedColumnState);
-      this.columns = { ...this.columns, ...savedColumns };
+    const savedVisibility = localStorage.getItem("tableColumnVisibility");
+    if (savedVisibility) {
+      this.columnVisibility = {
+        ...this.columnVisibility,
+        ...JSON.parse(savedVisibility),
+      };
     }
   },
 });

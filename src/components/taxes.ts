@@ -39,8 +39,8 @@ function grossToNet(gross: number): SalaryBreakdown {
       taxableIncome <= 14254
         ? (taxableIncome - 9744) * 0.14
         : taxableIncome <= 57918
-        ? (taxableIncome - 14254) * 0.3 + 970.58
-        : taxableIncome * 0.42 - 9336.45;
+          ? (taxableIncome - 14254) * 0.3 + 970.58
+          : taxableIncome * 0.42 - 9336.45;
   }
 
   // Net Salary
@@ -75,7 +75,7 @@ export function grossToNetRetired(
   grossPension: number,
   taxableRate: number, // Portion of the pension that is taxable (e.g., 0.8 for 80%)
   healthInsuranceRate: number = 0.073, // Default health insurance rate for retirees
-  longTermCareInsuranceRate: number = 0.0305 // Default long-term care rate for retirees
+  longTermCareInsuranceRate: number = 0.0305, // Default long-term care rate for retirees
 ): RetiredSalaryBreakdown {
   // Calculate health and long-term care insurance contributions
   const healthInsurance = grossPension * healthInsuranceRate;
@@ -93,8 +93,8 @@ export function grossToNetRetired(
       taxableIncome <= 14254
         ? (taxableIncome - 9744) * 0.14
         : taxableIncome <= 57918
-        ? (taxableIncome - 14254) * 0.3 + 970.58
-        : taxableIncome * 0.42 - 9336.45;
+          ? (taxableIncome - 14254) * 0.3 + 970.58
+          : taxableIncome * 0.42 - 9336.45;
   }
 
   // Calculate net pension

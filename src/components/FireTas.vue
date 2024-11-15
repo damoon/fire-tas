@@ -71,6 +71,10 @@
       <section class="form-section">
         <h2>Person A</h2>
         <div class="input-group">
+          <label>Name</label>
+          <input type="text" v-model="formData.personA.name" />
+        </div>
+        <div class="input-group">
           <label>Geburtsjahr</label>
           <input type="number" v-model="formData.personA.birthYear" />
         </div>
@@ -106,6 +110,10 @@
       <!-- Person B Section -->
       <section class="form-section">
         <h2>Person B</h2>
+        <div class="input-group">
+          <label>Name</label>
+          <input type="text" v-model="formData.personB.name" />
+        </div>
         <div class="input-group">
           <label>Geburtsjahr</label>
           <input type="number" v-model="formData.personB.birthYear" />
@@ -219,6 +227,7 @@ export default defineComponent({
           returnTax: 18.375,
         },
         personA: {
+          name: "Person A",
           birthYear: 1985,
           gross: 43142,
           net: 28774.5,
@@ -227,6 +236,7 @@ export default defineComponent({
           companyPension: 0,
         },
         personB: {
+          name: "Person B",
           birthYear: 1980,
           gross: 43142,
           net: 28774.5,

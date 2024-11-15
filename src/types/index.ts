@@ -10,6 +10,7 @@ export interface GeneralData {
 }
 
 export interface PersonData {
+  name: string;
   birthYear: number;
   gross: number;
   net: number;
@@ -42,6 +43,9 @@ export interface Column {
 
 export interface Columns {
   [key: string]: Column;
+}
+export interface ColumnVisibility {
+  [key: string]: boolean;
 }
 
 export interface YearlyDataRow {
