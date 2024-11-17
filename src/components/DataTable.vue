@@ -135,12 +135,13 @@ export default defineComponent({
     return {
       currentView: "Zeit",
       views: [
-        { name: "Zeit", columns: ["index", "year", "ageA", "ageB"] },
         {
-          name: "Faktoren",
+          name: "Zeit",
           columns: [
             "index",
             "year",
+            "ageA",
+            "ageB",
             "inflationFactor",
             "medianSalaryIncreaseFactor",
             "salaryIncreaseFactor",
