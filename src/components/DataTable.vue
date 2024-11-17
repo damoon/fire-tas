@@ -149,6 +149,8 @@ export default defineComponent({
         {
           name: "Investieren",
           columns: [
+            "index",
+            "year",
             "earnings",
             "investment",
             "totalInvested",
@@ -159,6 +161,8 @@ export default defineComponent({
         {
           name: "Rentenpunkte",
           columns: [
+            "index",
+            "year",
             "medianSalary",
             "grossA",
             "grossB",
@@ -173,6 +177,8 @@ export default defineComponent({
         {
           name: "Altersrente",
           columns: [
+            "index",
+            "year",
             "retirementPointsTotal",
             "retirementPointValue",
             "retirementGross",
@@ -182,6 +188,8 @@ export default defineComponent({
         {
           name: "Cashflow",
           columns: [
+            "index",
+            "year",
             "year",
             "earnings",
             "netPayout",
