@@ -34,6 +34,7 @@
         <tr
           v-for="row in yearlyData.filter((row) => row.year > 2000)"
           :key="row.year"
+          :class="{ deficit: row.income < row.expenses }"
         >
           <td v-show="columns.index.visible">{{ row.index }}</td>
           <td v-show="columns.year.visible">{{ row.year }}</td>
@@ -625,5 +626,13 @@ tr:nth-child(even) {
 
 tr:hover {
   background-color: #f5f5f5;
+}
+
+tr.deficit {
+  background-color: #ffcdd2;
+}
+
+tr.deficit:hover {
+  background-color: #ffebee;
 }
 </style>
