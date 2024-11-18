@@ -429,13 +429,12 @@ export default defineComponent({
           grossPayout =
             totalInvested * (this.formData.household.payoutRate / 100);
           netPayout = grossPayout * (1 - this.formData.general.returnTax / 100);
-          let reduction = 0;
-          reduction +=
-            totalInvested * (this.formData.household.payoutRate / 100);
-          reduction +=
+          const sequenceOrReturnRiskPremiumFactor =
+            1 + this.formData.household.sequenceOrReturnRiskPremium / 100;
+          totalInvested -=
             totalInvested *
-            (this.formData.household.sequenceOrReturnRiskPremium / 100);
-          totalInvested -= reduction;
+            sequenceOrReturnRiskPremiumFactor *
+            (this.formData.household.payoutRate / 100);
         }
 
         const currentMonth = new Date().getMonth() + 1;

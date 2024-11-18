@@ -191,7 +191,7 @@
           <input
             type="number"
             v-model="formData.household.sequenceOrReturnRiskPremium"
-            step="0.1"
+            step="1"
           />
         </div>
       </section>
