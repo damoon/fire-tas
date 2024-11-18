@@ -34,7 +34,11 @@
         <tr
           v-for="row in yearlyData.filter((row) => row.year > 2000)"
           :key="row.year"
-          :class="{ deficit: row.income < row.expenses }"
+          :class="{
+            deficit:
+              Math.round(row.income) < Math.round(row.expenses) ||
+              row.totalInvested < 0,
+          }"
         >
           <td v-show="columns.index.visible">{{ row.index }}</td>
           <td v-show="columns.year.visible">{{ row.year }}</td>
@@ -423,20 +427,6 @@ export default defineComponent({
 
         const expenses = this.formData.household.expenses * inflationFactor;
 
-        let grossPayout = 0;
-        let netPayout = 0;
-        if (fireYear <= year) {
-          grossPayout =
-            totalInvested * (this.formData.household.payoutRate / 100);
-          netPayout = grossPayout * (1 - this.formData.general.returnTax / 100);
-          const sequenceOrReturnRiskPremiumFactor =
-            1 + this.formData.household.sequenceOrReturnRiskPremium / 100;
-          totalInvested -=
-            totalInvested *
-            sequenceOrReturnRiskPremiumFactor *
-            (this.formData.household.payoutRate / 100);
-        }
-
         const currentMonth = new Date().getMonth() + 1;
         const remainingYearFactor = (12 - currentMonth) / 12;
         let investment = earnings - expenses;
@@ -451,11 +441,11 @@ export default defineComponent({
           this.formData.general.medianSalary * medianSalaryIncreaseFactor;
 
         let grossA = this.formData.personA.gross * salaryIncreaseFactor;
-        if (ageA >= retirementAge) {
+        if (ageA >= retirementAge || year >= fireYear) {
           grossA = 0;
         }
         let grossB = this.formData.personB.gross * salaryIncreaseFactor;
-        if (ageB >= retirementAge) {
+        if (ageB >= retirementAge || year >= fireYear) {
           grossB = 0;
         }
 
@@ -481,6 +471,17 @@ export default defineComponent({
           retirementGross,
           taxableRate,
         ).netPension;
+
+        let netPayout = 0;
+        let grossPayout = 0;
+        if (expenses - retirementNet - earnings > 0) {
+          netPayout = expenses - retirementNet + earnings - investment;
+          grossPayout = netPayout / (1 - this.formData.general.returnTax / 100);
+
+          const sequenceOrReturnRiskPremiumFactor =
+            1 + this.formData.household.sequenceOrReturnRiskPremium / 100;
+          totalInvested -= sequenceOrReturnRiskPremiumFactor * netPayout;
+        }
 
         const income = netPayout + retirementNet + earnings - investment;
 

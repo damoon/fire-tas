@@ -161,7 +161,12 @@
         </div>
         <div class="input-group">
           <label>Ausgaben</label>
-          <input type="number" v-model="formData.household.expenses" />
+          <input
+            type="number"
+            v-model="formData.household.expenses"
+            min="0"
+            step="1000"
+          />
         </div>
         <div class="input-group">
           <label>Coast Fire</label>
@@ -176,14 +181,6 @@
           <input
             type="number"
             v-model="formData.household.currentInvestments"
-          />
-        </div>
-        <div class="input-group">
-          <label>Auszahlungsquote (%)</label>
-          <input
-            type="number"
-            v-model="formData.household.payoutRate"
-            step="0.1"
           />
         </div>
         <div class="input-group">
@@ -248,7 +245,6 @@ export default defineComponent({
           expenses: 36000,
           coastAge: 50,
           fireAge: 60,
-          payoutRate: 2.7,
           sequenceOrReturnRiskPremium: 2.7,
           numberOfChildren: 1,
           currentInvestments: 50000,

@@ -23,7 +23,6 @@ export interface HouseholdData {
   expenses: number;
   coastAge: number;
   fireAge: number;
-  payoutRate: number;
   sequenceOrReturnRiskPremium: number;
   numberOfChildren: number;
   currentInvestments: number;
