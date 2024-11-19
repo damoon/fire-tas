@@ -1,201 +1,206 @@
 <template>
-  <div class="fire-tas">
-    <h1>FIRE TAS</h1>
+  <h1>FIRE TAS</h1>
 
-    <button class="toggle-button" @click="toggleAllSections">
-      {{ isExpanded ? "Eingabefelder ausblenden" : "Eingabefelder anzeigen" }}
-    </button>
-
-    <div class="sections-container" v-show="isExpanded">
-      <!-- General Section -->
-      <section class="form-section">
-        <h2>Allgemein</h2>
-        <div class="input-group">
-          <label>Inflation (%)</label>
-          <input
-            type="number"
-            v-model="formData.general.inflation"
-            step="0.1"
-            min="0"
-          />
-        </div>
-        <div class="input-group">
-          <label>Mediangehaltssteigerung (%)</label>
-          <input
-            type="number"
-            v-model="formData.general.medianSalaryIncrease"
-            step="0.1"
-            min="0"
-          />
-        </div>
-        <div class="input-group">
-          <label>Gehaltssteigerung (%)</label>
-          <input
-            type="number"
-            v-model="formData.general.salaryIncrease"
-            step="0.1"
-            min="0"
-          />
-        </div>
-        <div class="input-group">
-          <label>Mediangehalt 2023</label>
-          <input type="number" v-model="formData.general.medianSalary" />
-        </div>
-        <div class="input-group">
-          <label>Rentenpunktwert 2023</label>
-          <input type="number" v-model="formData.general.pensionPointValue" />
-        </div>
-        <div class="input-group">
-          <label>Rentenalter</label>
-          <input type="number" v-model="formData.general.retirementAge" />
-        </div>
-        <div class="input-group">
-          <label>Renditeerwartung (%)</label>
-          <input
-            type="number"
-            v-model="formData.general.expectedReturn"
-            step="0.1"
-          />
-        </div>
-        <div class="input-group">
-          <label>Steuern auf Rendite (%)</label>
-          <input
-            type="number"
-            v-model="formData.general.returnTax"
-            step="0.1"
-          />
-        </div>
-      </section>
-
-      <!-- Person A Section -->
-      <section class="form-section">
-        <h2>Person A</h2>
-        <div class="input-group">
-          <label>Name</label>
-          <input type="text" v-model="formData.personA.name" />
-        </div>
-        <div class="input-group">
-          <label>Geburtsjahr</label>
-          <input type="number" v-model="formData.personA.birthYear" />
-        </div>
-        <div class="input-group">
-          <label>Brutto</label>
-          <input type="number" v-model="formData.personA.gross" />
-        </div>
-        <div class="input-group">
-          <label>Netto</label>
-          <input type="number" v-model="formData.personA.net" />
-        </div>
-        <div class="input-group">
-          <label>Rentenpunkte</label>
-          <input
-            type="number"
-            v-model="formData.personA.pensionPoints"
-            step="0.1"
-          />
-        </div>
-        <div class="input-group">
-          <label>BaV aktuell</label>
-          <input
-            type="number"
-            v-model="formData.personA.currentCompanyPension"
-          />
-        </div>
-        <div class="input-group">
-          <label>BaV bei Rente</label>
-          <input type="number" v-model="formData.personA.companyPension" />
-        </div>
-      </section>
-
-      <!-- Person B Section -->
-      <section class="form-section">
-        <h2>Person B</h2>
-        <div class="input-group">
-          <label>Name</label>
-          <input type="text" v-model="formData.personB.name" />
-        </div>
-        <div class="input-group">
-          <label>Geburtsjahr</label>
-          <input type="number" v-model="formData.personB.birthYear" />
-        </div>
-        <div class="input-group">
-          <label>Brutto</label>
-          <input type="number" v-model="formData.personB.gross" />
-        </div>
-        <div class="input-group">
-          <label>Netto</label>
-          <input type="number" v-model="formData.personB.net" />
-        </div>
-        <div class="input-group">
-          <label>Rentenpunkte</label>
-          <input
-            type="number"
-            v-model="formData.personB.pensionPoints"
-            step="0.1"
-          />
-        </div>
-        <div class="input-group">
-          <label>BaV aktuell</label>
-          <input
-            type="number"
-            v-model="formData.personB.currentCompanyPension"
-          />
-        </div>
-        <div class="input-group">
-          <label>BaV bei Rente</label>
-          <input type="number" v-model="formData.personB.companyPension" />
-        </div>
-      </section>
-
-      <!-- Household Section -->
-      <section class="form-section">
-        <h2>Haushalt</h2>
-        <div class="input-group">
-          <label>Kinderanzahl</label>
-          <input
-            type="number"
-            v-model="formData.household.numberOfChildren"
-            min="0"
-            step="1"
-          />
-        </div>
-        <div class="input-group">
-          <label>Ausgaben</label>
-          <input
-            type="number"
-            v-model="formData.household.expenses"
-            min="0"
-            step="1000"
-          />
-        </div>
-        <div class="input-group">
-          <label>Coast Fire</label>
-          <input type="number" v-model="formData.household.coastAge" />
-        </div>
-        <div class="input-group">
-          <label>Fire</label>
-          <input type="number" v-model="formData.household.fireAge" />
-        </div>
-        <div class="input-group">
-          <label>Aktiendepot</label>
-          <input
-            type="number"
-            v-model="formData.household.currentInvestments"
-          />
-        </div>
-        <div class="input-group">
-          <label>Sequence of returns risk premium (%)</label>
-          <input
-            type="number"
-            v-model="formData.household.sequenceOrReturnRiskPremium"
-            step="1"
-          />
-        </div>
-      </section>
+  <!-- General Section -->
+  <section class="form-section">
+    <h2
+      @click="sectionStates.general = !sectionStates.general"
+      class="toggle-header"
+    >
+      Allgemein {{ sectionStates.general ? "▼" : "▶" }}
+    </h2>
+    <div v-show="sectionStates.general">
+      <div class="input-group">
+        <label>Inflation (%)</label>
+        <input
+          type="number"
+          v-model="formData.general.inflation"
+          step="0.1"
+          min="0"
+        />
+      </div>
+      <div class="input-group">
+        <label>Mediangehaltssteigerung (%)</label>
+        <input
+          type="number"
+          v-model="formData.general.medianSalaryIncrease"
+          step="0.1"
+          min="0"
+        />
+      </div>
+      <div class="input-group">
+        <label>Gehaltssteigerung (%)</label>
+        <input
+          type="number"
+          v-model="formData.general.salaryIncrease"
+          step="0.1"
+          min="0"
+        />
+      </div>
+      <div class="input-group">
+        <label>Mediangehalt 2023</label>
+        <input type="number" v-model="formData.general.medianSalary" />
+      </div>
+      <div class="input-group">
+        <label>Rentenpunktwert 2023</label>
+        <input type="number" v-model="formData.general.pensionPointValue" />
+      </div>
+      <div class="input-group">
+        <label>Rentenalter</label>
+        <input type="number" v-model="formData.general.retirementAge" />
+      </div>
+      <div class="input-group">
+        <label>Renditeerwartung (%)</label>
+        <input
+          type="number"
+          v-model="formData.general.expectedReturn"
+          step="0.1"
+        />
+      </div>
+      <div class="input-group">
+        <label>Steuern auf Rendite (%)</label>
+        <input type="number" v-model="formData.general.returnTax" step="0.1" />
+      </div>
     </div>
+  </section>
 
-    <DataTable :form-data="formData" />
-  </div>
+  <!-- Person A Section -->
+  <section class="form-section">
+    <h2
+      @click="sectionStates.personA = !sectionStates.personA"
+      class="toggle-header"
+    >
+      Person A {{ sectionStates.personA ? "▼" : "▶" }}
+    </h2>
+    <div v-show="sectionStates.personA">
+      <div class="input-group">
+        <label>Name</label>
+        <input type="text" v-model="formData.personA.name" />
+      </div>
+      <div class="input-group">
+        <label>Geburtsjahr</label>
+        <input type="number" v-model="formData.personA.birthYear" />
+      </div>
+      <div class="input-group">
+        <label>Brutto</label>
+        <input type="number" v-model="formData.personA.gross" />
+      </div>
+      <div class="input-group">
+        <label>Netto</label>
+        <input type="number" v-model="formData.personA.net" />
+      </div>
+      <div class="input-group">
+        <label>Rentenpunkte</label>
+        <input
+          type="number"
+          v-model="formData.personA.pensionPoints"
+          step="0.1"
+        />
+      </div>
+      <div class="input-group">
+        <label>BaV aktuell</label>
+        <input type="number" v-model="formData.personA.currentCompanyPension" />
+      </div>
+      <div class="input-group">
+        <label>BaV bei Rente</label>
+        <input type="number" v-model="formData.personA.companyPension" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Person B Section -->
+  <section class="form-section">
+    <h2
+      @click="sectionStates.personB = !sectionStates.personB"
+      class="toggle-header"
+    >
+      Person B {{ sectionStates.personB ? "▼" : "▶" }}
+    </h2>
+    <div v-show="sectionStates.personB">
+      <div class="input-group">
+        <label>Name</label>
+        <input type="text" v-model="formData.personB.name" />
+      </div>
+      <div class="input-group">
+        <label>Geburtsjahr</label>
+        <input type="number" v-model="formData.personB.birthYear" />
+      </div>
+      <div class="input-group">
+        <label>Brutto</label>
+        <input type="number" v-model="formData.personB.gross" />
+      </div>
+      <div class="input-group">
+        <label>Netto</label>
+        <input type="number" v-model="formData.personB.net" />
+      </div>
+      <div class="input-group">
+        <label>Rentenpunkte</label>
+        <input
+          type="number"
+          v-model="formData.personB.pensionPoints"
+          step="0.1"
+        />
+      </div>
+      <div class="input-group">
+        <label>BaV aktuell</label>
+        <input type="number" v-model="formData.personB.currentCompanyPension" />
+      </div>
+      <div class="input-group">
+        <label>BaV bei Rente</label>
+        <input type="number" v-model="formData.personB.companyPension" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Household Section -->
+  <section class="form-section">
+    <h2
+      @click="sectionStates.household = !sectionStates.household"
+      class="toggle-header"
+    >
+      Haushalt {{ sectionStates.household ? "▼" : "▶" }}
+    </h2>
+    <div v-show="sectionStates.household">
+      <div class="input-group">
+        <label>Kinderanzahl</label>
+        <input
+          type="number"
+          v-model="formData.household.numberOfChildren"
+          min="0"
+          step="1"
+        />
+      </div>
+      <div class="input-group">
+        <label>Ausgaben</label>
+        <input
+          type="number"
+          v-model="formData.household.expenses"
+          min="0"
+          step="1000"
+        />
+      </div>
+      <div class="input-group">
+        <label>Coast Fire</label>
+        <input type="number" v-model="formData.household.coastAge" />
+      </div>
+      <div class="input-group">
+        <label>Fire</label>
+        <input type="number" v-model="formData.household.fireAge" />
+      </div>
+      <div class="input-group">
+        <label>Aktiendepot</label>
+        <input type="number" v-model="formData.household.currentInvestments" />
+      </div>
+      <div class="input-group">
+        <label>Sequence of returns risk premium (%)</label>
+        <input
+          type="number"
+          v-model="formData.household.sequenceOrReturnRiskPremium"
+          step="1"
+        />
+      </div>
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -211,7 +216,12 @@ export default defineComponent({
 
   data() {
     return {
-      isExpanded: true,
+      sectionStates: {
+        general: true,
+        personA: true,
+        personB: true,
+        household: true,
+      },
       formData: {
         general: {
           inflation: 3.0,
@@ -253,17 +263,12 @@ export default defineComponent({
     };
   },
 
-  methods: {
-    toggleAllSections(): void {
-      this.isExpanded = !this.isExpanded;
-      localStorage.setItem("inputSectionsExpanded", String(this.isExpanded));
-    },
-  },
+  methods: {},
 
   mounted(): void {
-    const savedExpandedState = localStorage.getItem("inputSectionsExpanded");
-    if (savedExpandedState !== null) {
-      this.isExpanded = savedExpandedState === "true";
+    const savedSections = localStorage.getItem("sectionStates");
+    if (savedSections) {
+      this.sectionStates = JSON.parse(savedSections);
     }
 
     const savedData = localStorage.getItem("fireTasData");
@@ -273,9 +278,16 @@ export default defineComponent({
   },
 
   watch: {
+    sectionStates: {
+      handler(newValue) {
+        localStorage.setItem("sectionStates", JSON.stringify(newValue));
+      },
+      deep: true,
+    },
     formData: {
       handler(newValue: FormData): void {
         localStorage.setItem("fireTasData", JSON.stringify(newValue));
+        this.$emit("update:formData", newValue);
       },
       deep: true,
     },
@@ -284,32 +296,15 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.toggle-button {
-  margin: 20px 0;
-  padding: 10px 20px;
-  background-color: #2c3e50;
-  color: white;
-  border: none;
-  border-radius: 4px;
+.toggle-header {
   cursor: pointer;
-  font-size: 1em;
-  transition: background-color 0.3s ease;
+  user-select: none;
 }
-.toggle-button:hover {
-  background-color: #34495e;
-}
-
-.fire-tas {
-  padding: 5px;
-}
-
-.sections-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin: 0 auto;
-  max-width: 1400px;
+h2 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: #2c3e50;
+  font-size: 20px;
 }
 
 .form-section {
@@ -338,11 +333,5 @@ export default defineComponent({
   border: 1px solid #ddd;
   border-radius: 4px;
   box-sizing: border-box;
-}
-
-h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #2c3e50;
 }
 </style>
