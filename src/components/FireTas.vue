@@ -4,10 +4,10 @@
   <!-- General Section -->
   <section class="form-section">
     <h2
-      @click="sectionStates.general = !sectionStates.general"
+      @click="toggleSection('general')"
       class="toggle-header"
     >
-      Allgemein {{ sectionStates.general ? "▼" : "▶" }}
+      Allgemein {{ sectionStates.general ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.general">
       <div class="input-group">
@@ -67,10 +67,10 @@
   <!-- Person A Section -->
   <section class="form-section">
     <h2
-      @click="sectionStates.personA = !sectionStates.personA"
+      @click="toggleSection('personA')"
       class="toggle-header"
     >
-      Person A {{ sectionStates.personA ? "▼" : "▶" }}
+      Person A {{ sectionStates.personA ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.personA">
       <div class="input-group">
@@ -111,10 +111,10 @@
   <!-- Person B Section -->
   <section class="form-section">
     <h2
-      @click="sectionStates.personB = !sectionStates.personB"
+      @click="toggleSection('personB')"
       class="toggle-header"
     >
-      Person B {{ sectionStates.personB ? "▼" : "▶" }}
+      Person B {{ sectionStates.personB ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.personB">
       <div class="input-group">
@@ -155,10 +155,10 @@
   <!-- Household Section -->
   <section class="form-section">
     <h2
-      @click="sectionStates.household = !sectionStates.household"
+      @click="toggleSection('household')"
       class="toggle-header"
     >
-      Haushalt {{ sectionStates.household ? "▼" : "▶" }}
+      Haushalt {{ sectionStates.household ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.household">
       <div class="input-group">
@@ -206,7 +206,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import DataTable from "./DataTable.vue";
-import type { FormData, Columns } from "@/types";
+import type { FormData } from "@/types";
 
 export default defineComponent({
   name: "FireTas",
@@ -217,10 +217,10 @@ export default defineComponent({
   data() {
     return {
       sectionStates: {
-        general: true,
-        personA: true,
-        personB: true,
-        household: true,
+        general: false,
+        personA: false,
+        personB: false,
+        household: false,
       },
       formData: {
         general: {
@@ -263,7 +263,15 @@ export default defineComponent({
     };
   },
 
-  methods: {},
+  methods: {
+    toggleSection(section: string) {
+      Object.keys(this.sectionStates).forEach((key: string) => {
+        const sectionKeys = Object.keys(this.sectionStates) as Array<keyof typeof this.sectionStates>;
+        type SectionKey = typeof sectionKeys[number];
+        this.sectionStates[key as SectionKey] = key === section ? !this.sectionStates[key as SectionKey] : false;
+      });
+    },
+  },
 
   mounted(): void {
     const savedSections = localStorage.getItem("sectionStates");
@@ -302,18 +310,14 @@ export default defineComponent({
 }
 h2 {
   margin-top: 0;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   color: #2c3e50;
   font-size: 20px;
 }
 
 .form-section {
-  flex: 1;
   min-width: 250px;
-  background-color: #f5f5f5;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .input-group {

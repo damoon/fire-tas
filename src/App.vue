@@ -1,5 +1,4 @@
 <template>
-  <div id="app">
     <div
       class="left-panel"
       :class="{ collapsed: !isPanelExpanded }"
@@ -8,17 +7,20 @@
       <div v-show="isPanelExpanded">
         <FireTas @update:formData="updateFormData" />
       </div>
+      <div v-show="!isPanelExpanded" class="collapsed-text">
+        FIRE TAS - Einstellungen
+      </div>
     </div>
     <div class="main-content" @click="closePanel">
       <DataTable :form-data="formData" />
     </div>
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import FireTas from "@/components/FireTas.vue";
 import DataTable from "@/components/DataTable.vue";
+import type { FormData } from "@/types";
 
 export default defineComponent({
   name: "FIRE TAS",
@@ -29,7 +31,12 @@ export default defineComponent({
   data() {
     return {
       isPanelExpanded: false,
-      formData: {},
+      formData: {
+        general: {},
+        personA: {},
+        personB: {},
+        household: {}
+      } as FormData,
     };
   },
   methods: {
@@ -39,10 +46,23 @@ export default defineComponent({
     closePanel() {
       this.isPanelExpanded = false;
     },
-    updateFormData(newData) {
-      this.formData = newData;
+    updateFormData(formData: FormData) {
+      this.formData = formData;
     },
   },
+  created() {
+    // Initialize isPanelExpanded from localStorage
+    const savedState = localStorage.getItem('isPanelExpanded');
+    if (savedState !== null) {
+      this.isPanelExpanded = JSON.parse(savedState);
+    }
+  },
+  watch: {
+    isPanelExpanded(newValue) {
+      // Save isPanelExpanded to localStorage
+      localStorage.setItem('isPanelExpanded', JSON.stringify(newValue));
+    }
+  }
 });
 </script>
 
@@ -54,21 +74,30 @@ export default defineComponent({
   height: 100vh;
   width: 300px;
   background: #f5f5f5;
-  transition: width 0.3s ease;
   border-right: 1px solid #ddd;
 }
 
 .left-panel.collapsed {
   width: 50px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsed-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  white-space: nowrap;
+  font-size: 24px;
 }
 
 .main-content {
-  margin-left: 200px;
-  transition: margin-left 0.3s ease;
+  margin-left: 50px;
 }
 
 .collapsed + .main-content {
-  margin-left: 75px;
+  margin-left: 50px;
 }
 
 #app {
