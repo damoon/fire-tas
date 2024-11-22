@@ -1,12 +1,13 @@
 <template>
-  <h1>FIRE TAS</h1>
+  <img
+    src="/favicon.svg"
+    alt="FIRE TAS Logo"
+    style="width: 150px; margin: 5px auto"
+  />
 
   <!-- General Section -->
   <section class="form-section">
-    <h2
-      @click="toggleSection('general')"
-      class="toggle-header"
-    >
+    <h2 @click="toggleSection('general')" class="toggle-header">
       Allgemein {{ sectionStates.general ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.general">
@@ -66,10 +67,7 @@
 
   <!-- Person A Section -->
   <section class="form-section">
-    <h2
-      @click="toggleSection('personA')"
-      class="toggle-header"
-    >
+    <h2 @click="toggleSection('personA')" class="toggle-header">
       Person A {{ sectionStates.personA ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.personA">
@@ -110,10 +108,7 @@
 
   <!-- Person B Section -->
   <section class="form-section">
-    <h2
-      @click="toggleSection('personB')"
-      class="toggle-header"
-    >
+    <h2 @click="toggleSection('personB')" class="toggle-header">
       Person B {{ sectionStates.personB ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.personB">
@@ -154,10 +149,7 @@
 
   <!-- Household Section -->
   <section class="form-section">
-    <h2
-      @click="toggleSection('household')"
-      class="toggle-header"
-    >
+    <h2 @click="toggleSection('household')" class="toggle-header">
       Haushalt {{ sectionStates.household ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.household">
@@ -189,14 +181,18 @@
       </div>
       <div class="input-group">
         <label>Aktiendepot</label>
-        <input type="number" v-model="formData.household.currentInvestments" />
+        <input
+          type="number"
+          v-model="formData.household.currentInvestments"
+          step="1000"
+        />
       </div>
       <div class="input-group">
         <label>Sequence of returns risk premium (%)</label>
         <input
           type="number"
           v-model="formData.household.sequenceOrReturnRiskPremium"
-          step="1"
+          step="5"
         />
       </div>
     </div>
@@ -235,7 +231,7 @@ export default defineComponent({
         },
         personA: {
           name: "Person A",
-          birthYear: 1985,
+          birthYear: 1984,
           gross: 43142,
           net: 28774.5,
           pensionPoints: 20,
@@ -244,7 +240,7 @@ export default defineComponent({
         },
         personB: {
           name: "Person B",
-          birthYear: 1980,
+          birthYear: 1982,
           gross: 43142,
           net: 28774.5,
           pensionPoints: 20,
@@ -253,11 +249,11 @@ export default defineComponent({
         },
         household: {
           expenses: 36000,
-          coastAge: 50,
-          fireAge: 60,
-          sequenceOrReturnRiskPremium: 2.7,
+          coastAge: 55,
+          fireAge: 64,
+          sequenceOrReturnRiskPremium: 50,
           numberOfChildren: 1,
-          currentInvestments: 50000,
+          currentInvestments: 100000,
         },
       } as FormData,
     };
@@ -266,9 +262,12 @@ export default defineComponent({
   methods: {
     toggleSection(section: string) {
       Object.keys(this.sectionStates).forEach((key: string) => {
-        const sectionKeys = Object.keys(this.sectionStates) as Array<keyof typeof this.sectionStates>;
-        type SectionKey = typeof sectionKeys[number];
-        this.sectionStates[key as SectionKey] = key === section ? !this.sectionStates[key as SectionKey] : false;
+        const sectionKeys = Object.keys(this.sectionStates) as Array<
+          keyof typeof this.sectionStates
+        >;
+        type SectionKey = (typeof sectionKeys)[number];
+        this.sectionStates[key as SectionKey] =
+          key === section ? !this.sectionStates[key as SectionKey] : false;
       });
     },
   },
@@ -283,6 +282,8 @@ export default defineComponent({
     if (savedData) {
       this.formData = JSON.parse(savedData);
     }
+
+    this.$emit("update:formData", this.formData);
   },
 
   watch: {

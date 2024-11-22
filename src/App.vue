@@ -1,19 +1,19 @@
 <template>
-    <div
-      class="left-panel"
-      :class="{ collapsed: !isPanelExpanded }"
-      @click.stop="openPanel"
-    >
-      <div v-show="isPanelExpanded">
-        <FireTas @update:formData="updateFormData" />
-      </div>
-      <div v-show="!isPanelExpanded" class="collapsed-text">
-        FIRE TAS - Einstellungen
-      </div>
+  <div
+    class="left-panel"
+    :class="{ collapsed: !isPanelExpanded }"
+    @click.stop="openPanel"
+  >
+    <div v-show="isPanelExpanded">
+      <FireTas @update:formData="updateFormData" />
     </div>
-    <div class="main-content" @click="closePanel">
-      <DataTable :form-data="formData" />
+    <div v-show="!isPanelExpanded" class="collapsed-text">
+      FIRE TAS - Einstellungen
     </div>
+  </div>
+  <div class="main-content" @click="closePanel">
+    <DataTable :form-data="formData" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -35,7 +35,7 @@ export default defineComponent({
         general: {},
         personA: {},
         personB: {},
-        household: {}
+        household: {},
       } as FormData,
     };
   },
@@ -52,7 +52,7 @@ export default defineComponent({
   },
   created() {
     // Initialize isPanelExpanded from localStorage
-    const savedState = localStorage.getItem('isPanelExpanded');
+    const savedState = localStorage.getItem("isPanelExpanded");
     if (savedState !== null) {
       this.isPanelExpanded = JSON.parse(savedState);
     }
@@ -60,9 +60,9 @@ export default defineComponent({
   watch: {
     isPanelExpanded(newValue) {
       // Save isPanelExpanded to localStorage
-      localStorage.setItem('isPanelExpanded', JSON.stringify(newValue));
-    }
-  }
+      localStorage.setItem("isPanelExpanded", JSON.stringify(newValue));
+    },
+  },
 });
 </script>
 
@@ -93,7 +93,7 @@ export default defineComponent({
 }
 
 .main-content {
-  margin-left: 50px;
+  margin-left: 300px;
 }
 
 .collapsed + .main-content {

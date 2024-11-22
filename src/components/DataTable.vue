@@ -528,7 +528,11 @@ export default defineComponent({
     },
   },
 
-  mounted() {
+  created() {
+    if (!localStorage.getItem("tableViewName")) {
+      this.currentView = "Cashflow";
+      this.activateView("Cashflow");
+    }
     const savedView = localStorage.getItem("tableViewName");
     if (savedView) {
       this.currentView = savedView;

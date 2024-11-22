@@ -18,4 +18,11 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  assetsInclude: ["**/*.svg"],
+  server: {
+    middlewareMode: false,
+    fs: {
+      strict: true,
+    },
+  },
 });
