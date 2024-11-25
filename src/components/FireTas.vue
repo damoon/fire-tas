@@ -1,9 +1,10 @@
 <template>
   <img
-    src="/favicon.svg"
+    src="/icon.svg"
     alt="FIRE TAS Logo"
-    style="width: 150px; margin: 5px auto"
+    style="width: 50px; margin: 5px auto 0px"
   />
+  <h1>FIRE TAS</h1>
 
   <!-- General Section -->
   <section class="form-section">
@@ -309,10 +310,16 @@ export default defineComponent({
   cursor: pointer;
   user-select: none;
 }
+h1,
 h2 {
   margin-top: 0;
   margin-bottom: 10px;
   color: #2c3e50;
+}
+h1 {
+  font-size: 24px;
+}
+h2 {
   font-size: 20px;
 }
 

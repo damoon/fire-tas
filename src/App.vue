@@ -8,6 +8,11 @@
       <FireTas @update:formData="updateFormData" />
     </div>
     <div v-show="!isPanelExpanded" class="collapsed-text">
+      <img
+        src="/icon.svg"
+        alt="FIRE TAS Logo"
+        style="width: 24px; vertical-align: top"
+      />
       FIRE TAS - Einstellungen
     </div>
   </div>
