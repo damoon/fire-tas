@@ -48,6 +48,12 @@
         <input type="number" v-model="formData.general.pensionPointValue" />
       </div>
       <div class="input-group">
+        <label>Rentensicherheit (%)</label>
+        <input type="number" v-model="formData.general.pensionRiskAdjustment"
+          step="1"
+          min="0" />
+      </div>
+      <div class="input-group">
         <label>Rentenalter</label>
         <input type="number" v-model="formData.general.retirementAge" />
       </div>
@@ -164,6 +170,15 @@
         />
       </div>
       <div class="input-group">
+        <label>Kindsalter</label>
+        <input
+          type="number"
+          v-model="formData.household.childsAge"
+          min="0"
+          step="1"
+        />
+      </div>
+      <div class="input-group">
         <label>Ausgaben</label>
         <input
           type="number"
@@ -226,6 +241,7 @@ export default defineComponent({
           medianSalaryIncrease: 2.0,
           medianSalary: 43142,
           pensionPointValue: 39.32,
+          pensionRiskAdjustment: 70,
           retirementAge: 67,
           expectedReturn: 7,
           returnTax: 18.375,
@@ -254,6 +270,7 @@ export default defineComponent({
           fireAge: 64,
           sequenceOrReturnRiskPremium: 50,
           numberOfChildren: 1,
+          childsAge: 2,
           currentInvestments: 100000,
         },
       } as FormData,

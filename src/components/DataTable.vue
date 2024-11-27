@@ -387,9 +387,9 @@ export default defineComponent({
         birthYearA + this.formData.general.retirementAge,
         birthYearB + this.formData.general.retirementAge,
       );
-      if (fireYear > retirementYear) {
-        fireYear = retirementYear;
-      }
+      // if (fireYear > retirementYear) {
+      //   fireYear = retirementYear;
+      // }
       const taxableRate = calculateTaxableRate(retirementYear);
 
       let totalInvested = this.formData.household.currentInvestments;
@@ -417,12 +417,14 @@ export default defineComponent({
         );
 
         let earnings = 0;
-        if (fireYear > year) {
-          earnings =
-            (this.formData.personA.net +
-              this.formData.personB.net +
-              this.formData.household.numberOfChildren * 250 * 12) *
-            salaryIncreaseFactor;
+        if (index + this.formData.household.childsAge <= 18) {
+          earnings += this.formData.household.numberOfChildren * 250 * 12 * salaryIncreaseFactor;
+        }
+        if (ageA < retirementAge && year < fireYear) {
+          earnings += this.formData.personA.net * salaryIncreaseFactor;
+        }
+        if (ageB < retirementAge && year < fireYear) {
+          earnings += this.formData.personB.net * salaryIncreaseFactor;
         }
 
         const expenses = this.formData.household.expenses * inflationFactor;
@@ -433,7 +435,7 @@ export default defineComponent({
         // if (index === 1) {
         //	investment = investment * remainingYearFactor;
         //}
-        if (year >= coastYear) {
+        if (year >= coastYear || investment < 0) {
           investment = 0;
         }
 
@@ -449,8 +451,12 @@ export default defineComponent({
           grossB = 0;
         }
 
-        const retirementPointsA = grossA / medianSalary;
-        const retirementPointsB = grossB / medianSalary;
+        let retirementPointsA = grossA / medianSalary;
+        let retirementPointsB = grossB / medianSalary;
+        if (year >= coastYear) {
+          retirementPointsA /= 2;
+          retirementPointsB /= 2;
+        }
         const retirementPoints = retirementPointsA + retirementPointsB;
 
         retirementPointsTotalA += retirementPointsA;
@@ -470,12 +476,13 @@ export default defineComponent({
         const retirementNet = grossToNetRetired(
           retirementGross,
           taxableRate,
-        ).netPension;
+        ).netPension * (100/this.formData.general.pensionRiskAdjustment);
 
         let netPayout = 0;
         let grossPayout = 0;
-        if (expenses - retirementNet - earnings > 0) {
-          netPayout = expenses - retirementNet + earnings - investment;
+        const higherExpenses = year >= fireYear && year < retirementYear ? expenses * 1.5 : expenses;
+        if (higherExpenses - retirementNet - earnings > 0) {
+          netPayout = higherExpenses - retirementNet + earnings - investment;
           grossPayout = netPayout / (1 - this.formData.general.returnTax / 100);
 
           const sequenceOrReturnRiskPremiumFactor =
@@ -493,7 +500,7 @@ export default defineComponent({
           inflationFactor,
           medianSalaryIncreaseFactor,
           salaryIncreaseFactor,
-          expenses,
+          expenses: higherExpenses,
           earnings,
           investment,
           totalInvested,

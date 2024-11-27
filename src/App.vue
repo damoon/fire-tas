@@ -49,7 +49,7 @@ export default defineComponent({
       this.isPanelExpanded = true;
     },
     closePanel() {
-      this.isPanelExpanded = false;
+      // this.isPanelExpanded = false;
     },
     updateFormData(formData: FormData) {
       this.formData = formData;

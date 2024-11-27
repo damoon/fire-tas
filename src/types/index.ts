@@ -4,6 +4,7 @@ export interface GeneralData {
   medianSalary: number;
   medianSalaryIncrease: number;
   pensionPointValue: number;
+  pensionRiskAdjustment: number;
   retirementAge: number;
   expectedReturn: number;
   returnTax: number;
@@ -25,6 +26,7 @@ export interface HouseholdData {
   fireAge: number;
   sequenceOrReturnRiskPremium: number;
   numberOfChildren: number;
+  childsAge: number;
   currentInvestments: number;
 }
 
