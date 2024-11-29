@@ -418,7 +418,11 @@ export default defineComponent({
 
         let earnings = 0;
         if (index + this.formData.household.childsAge <= 18) {
-          earnings += this.formData.household.numberOfChildren * 250 * 12 * salaryIncreaseFactor;
+          earnings +=
+            this.formData.household.numberOfChildren *
+            250 *
+            12 *
+            salaryIncreaseFactor;
         }
         if (ageA < retirementAge && year < fireYear) {
           earnings += this.formData.personA.net * salaryIncreaseFactor;
@@ -432,9 +436,9 @@ export default defineComponent({
         const currentMonth = new Date().getMonth() + 1;
         const remainingYearFactor = (12 - currentMonth) / 12;
         let investment = earnings - expenses;
-        // if (index === 1) {
-        //	investment = investment * remainingYearFactor;
-        //}
+        if (index === 1) {
+          investment = investment * remainingYearFactor;
+        }
         if (year >= coastYear || investment < 0) {
           investment = 0;
         }
@@ -454,8 +458,8 @@ export default defineComponent({
         let retirementPointsA = grossA / medianSalary;
         let retirementPointsB = grossB / medianSalary;
         if (year >= coastYear) {
-          retirementPointsA /= 2;
-          retirementPointsB /= 2;
+          retirementPointsA = Math.min(retirementPointsA / 2, 0.5);
+          retirementPointsB = Math.min(retirementPointsB / 2, 0.5);
         }
         const retirementPoints = retirementPointsA + retirementPointsB;
 
@@ -473,14 +477,14 @@ export default defineComponent({
         if (ageB >= retirementAge) {
           retirementGross += retirementPointValue * retirementPointsTotalB * 12;
         }
-        const retirementNet = grossToNetRetired(
-          retirementGross,
-          taxableRate,
-        ).netPension * (100/this.formData.general.pensionRiskAdjustment);
+        const retirementNet =
+          grossToNetRetired(retirementGross, taxableRate).netPension *
+          (100 / this.formData.general.pensionRiskAdjustment);
 
         let netPayout = 0;
         let grossPayout = 0;
-        const higherExpenses = year >= fireYear && year < retirementYear ? expenses * 1.5 : expenses;
+        const higherExpenses =
+          year >= fireYear && year < retirementYear ? expenses * 1.5 : expenses;
         if (higherExpenses - retirementNet - earnings > 0) {
           netPayout = higherExpenses - retirementNet + earnings - investment;
           grossPayout = netPayout / (1 - this.formData.general.returnTax / 100);

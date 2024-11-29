@@ -49,9 +49,12 @@
       </div>
       <div class="input-group">
         <label>Rentensicherheit (%)</label>
-        <input type="number" v-model="formData.general.pensionRiskAdjustment"
+        <input
+          type="number"
+          v-model="formData.general.pensionRiskAdjustment"
           step="1"
-          min="0" />
+          min="0"
+        />
       </div>
       <div class="input-group">
         <label>Rentenalter</label>
