@@ -101,6 +101,12 @@
           <td v-show="columns.retirementGross.visible">
             {{ formatCurrency(row.retirementGross) }}
           </td>
+          <td v-show="columns.companyPensionA.visible">
+            {{ formatCurrency(row.companyPensionA) }}
+          </td>
+          <td v-show="columns.companyPensionB.visible">
+            {{ formatCurrency(row.companyPensionB) }}
+          </td>
           <td v-show="columns.retirementNet.visible">
             {{ formatCurrency(row.retirementNet) }}
           </td>
@@ -188,6 +194,8 @@ export default defineComponent({
             "retirementPointsTotal",
             "retirementPointValue",
             "retirementGross",
+            "companyPensionA",
+            "companyPensionB",
             "retirementNet",
           ],
         },
@@ -229,6 +237,8 @@ export default defineComponent({
         retirementPointsTotal: true,
         retirementPointValue: true,
         retirementGross: true,
+        companyPensionA: true,
+        companyPensionB: true,
         retirementNet: true,
         income: true,
         expenses: true,
@@ -357,6 +367,14 @@ export default defineComponent({
           visible: this.columnVisibility.retirementGross,
           label: "Altersrente Brutto",
         },
+        companyPensionA: {
+          visible: this.columnVisibility.companyPensionA,
+          label: "BaV " + this.formData.personA.name,
+        },
+        companyPensionB: {
+          visible: this.columnVisibility.companyPensionB,
+          label: "BaV " + this.formData.personB.name,
+        },
         retirementNet: {
           visible: this.columnVisibility.retirementNet,
           label: "Altersrente Netto",
@@ -399,6 +417,19 @@ export default defineComponent({
       let retirementPointsTotalA = this.formData.personA.pensionPoints;
       let retirementPointsTotalB = this.formData.personB.pensionPoints;
 
+      let companyPensionA = this.formData.personA.currentCompanyPension;
+      let companyPensionB = this.formData.personB.currentCompanyPension;
+      const ageA = currentYear - birthYearA;
+      const ageB = currentYear - birthYearB;
+      const companyPensionGrowthA =
+        (this.formData.personA.companyPension -
+          this.formData.personA.currentCompanyPension) /
+        (this.formData.general.retirementAge - ageA);
+      const companyPensionGrowthB =
+        (this.formData.personB.companyPension -
+          this.formData.personB.currentCompanyPension) /
+        (this.formData.general.retirementAge - ageB);
+
       for (let year = currentYear; year <= maxYear; year++) {
         const ageA = year - birthYearA;
         const ageB = year - birthYearB;
@@ -436,6 +467,7 @@ export default defineComponent({
         const currentMonth = new Date().getMonth() + 1;
         const remainingYearFactor = (12 - currentMonth) / 12;
         let investment = earnings - expenses;
+        const originalInvestment = investment;
         if (index === 1) {
           investment = investment * remainingYearFactor;
         }
@@ -477,8 +509,27 @@ export default defineComponent({
         if (ageB >= retirementAge) {
           retirementGross += retirementPointValue * retirementPointsTotalB * 12;
         }
+
+        if (ageA < retirementAge) {
+          if (year < coastYear) {
+            companyPensionA += companyPensionGrowthA;
+          } else {
+            companyPensionA += 0.5 * companyPensionGrowthA;
+          }
+        }
+        if (ageB < retirementAge) {
+          if (year < coastYear) {
+            companyPensionB += companyPensionGrowthB;
+          } else {
+            companyPensionB += 0.5 * companyPensionGrowthB;
+          }
+        }
+
         const retirementNet =
-          grossToNetRetired(retirementGross, taxableRate).netPension *
+          grossToNetRetired(
+            retirementGross + companyPensionA + companyPensionB,
+            taxableRate,
+          ).netPension *
           (100 / this.formData.general.pensionRiskAdjustment);
 
         let netPayout = 0;
@@ -494,7 +545,8 @@ export default defineComponent({
           totalInvested -= sequenceOrReturnRiskPremiumFactor * netPayout;
         }
 
-        const income = netPayout + retirementNet + earnings - investment;
+        const income =
+          netPayout + retirementNet + earnings - originalInvestment;
 
         data.push({
           index,
@@ -522,6 +574,8 @@ export default defineComponent({
           retirementPointValue,
           retirementGross,
           retirementNet,
+          companyPensionA,
+          companyPensionB,
           income,
         });
 

@@ -78,7 +78,8 @@
   <!-- Person A Section -->
   <section class="form-section">
     <h2 @click="toggleSection('personA')" class="toggle-header">
-      Person A {{ sectionStates.personA ? "▼" : "►" }}
+      {{ formData.personA.name || "Person A" }}
+      {{ sectionStates.personA ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.personA">
       <div class="input-group">
@@ -119,7 +120,8 @@
   <!-- Person B Section -->
   <section class="form-section">
     <h2 @click="toggleSection('personB')" class="toggle-header">
-      Person B {{ sectionStates.personB ? "▼" : "►" }}
+      {{ formData.personB.name || "Person B" }}
+      {{ sectionStates.personB ? "▼" : "►" }}
     </h2>
     <div v-show="sectionStates.personB">
       <div class="input-group">

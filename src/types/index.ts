@@ -75,5 +75,7 @@ export interface YearlyDataRow {
   retirementPointValue: number;
   retirementGross: number;
   retirementNet: number;
+  companyPensionA: number;
+  companyPensionB: number;
   income: number;
 }
