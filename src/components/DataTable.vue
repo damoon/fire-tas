@@ -116,6 +116,14 @@
           <td v-show="columns.expenses.visible">
             {{ formatCurrency(row.expenses) }}
           </td>
+          <td v-show="columns.events.visible">
+            {{
+              Object.entries(row.events)
+                .filter(([_, value]) => value)
+                .map(([key]) => key)
+                .join(", ")
+            }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -210,6 +218,7 @@ export default defineComponent({
             "retirementNet",
             "income",
             "expenses",
+            "events",
           ],
         },
       ],
@@ -241,6 +250,7 @@ export default defineComponent({
         companyPensionB: true,
         retirementNet: true,
         income: true,
+        events: true,
         expenses: true,
       } as ColumnVisibility,
     };
@@ -380,6 +390,7 @@ export default defineComponent({
           label: "Altersrente Netto",
         },
         income: { visible: this.columnVisibility.income, label: "Einnahmen" },
+        events: { visible: this.columnVisibility.events, label: "Events" },
         expenses: {
           visible: this.columnVisibility.expenses,
           label: "Ausgaben",
@@ -525,12 +536,15 @@ export default defineComponent({
           }
         }
 
-        const retirementNet =
-          grossToNetRetired(
-            retirementGross + companyPensionA + companyPensionB,
-            taxableRate,
-          ).netPension *
-          (100 / this.formData.general.pensionRiskAdjustment);
+        let retirementNet = 0;
+        if (year >= retirementYear) {
+          retirementNet =
+            grossToNetRetired(
+              retirementGross + companyPensionA + companyPensionB,
+              taxableRate,
+            ).netPension *
+            (100 / this.formData.general.pensionRiskAdjustment);
+        }
 
         let netPayout = 0;
         let grossPayout = 0;
@@ -547,6 +561,17 @@ export default defineComponent({
 
         const income =
           netPayout + retirementNet + earnings - originalInvestment;
+
+        const events = {};
+        if (
+          totalInvested > 1_000_000 &&
+          !data.some((d) => d.events.oneMillion)
+        ) {
+          events.oneMillion = true;
+        }
+        if (year == coastYear) {
+          events.coastFire = true;
+        }
 
         data.push({
           index,
@@ -577,6 +602,7 @@ export default defineComponent({
           companyPensionA,
           companyPensionB,
           income,
+          events,
         });
 
         let investmentReturn =

@@ -45,8 +45,23 @@ export interface Column {
 export interface Columns {
   [key: string]: Column;
 }
+
 export interface ColumnVisibility {
   [key: string]: boolean;
+}
+
+export interface Events {
+  coastFire: boolean;
+  leanFire: boolean;
+  fire: boolean;
+  fatFire: boolean;
+  retired: boolean;
+  oneMillion: boolean;
+  portfolioDeclining: boolean;
+  supportLowerIncome: boolean;
+  supportHigherIncome: boolean;
+  averageDeathA: boolean;
+  averageDeathB: boolean;
 }
 
 export interface YearlyDataRow {
@@ -78,4 +93,5 @@ export interface YearlyDataRow {
   companyPensionA: number;
   companyPensionB: number;
   income: number;
+  events: Events;
 }
