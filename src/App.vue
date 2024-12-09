@@ -1,22 +1,8 @@
 <template>
-  <div
-    class="left-panel"
-    :class="{ collapsed: !isPanelExpanded }"
-    @click.stop="openPanel"
-  >
-    <div v-show="isPanelExpanded">
-      <FireTas @update:formData="updateFormData" />
-    </div>
-    <div v-show="!isPanelExpanded" class="collapsed-text">
-      <img
-        src="/icon.svg"
-        alt="FIRE TAS Logo"
-        style="width: 24px; vertical-align: top"
-      />
-      FIRE TAS - Einstellungen
-    </div>
+  <div class="left-panel">
+    <FireTas @update:formData="updateFormData" />
   </div>
-  <div class="main-content" @click="closePanel">
+  <div class="main-content">
     <DataTable :form-data="formData" />
   </div>
 </template>
@@ -35,7 +21,6 @@ export default defineComponent({
   },
   data() {
     return {
-      isPanelExpanded: false,
       formData: {
         general: {},
         personA: {},
@@ -45,27 +30,8 @@ export default defineComponent({
     };
   },
   methods: {
-    openPanel() {
-      this.isPanelExpanded = true;
-    },
-    closePanel() {
-      // this.isPanelExpanded = false;
-    },
     updateFormData(formData: FormData) {
       this.formData = formData;
-    },
-  },
-  created() {
-    // Initialize isPanelExpanded from localStorage
-    const savedState = localStorage.getItem("isPanelExpanded");
-    if (savedState !== null) {
-      this.isPanelExpanded = JSON.parse(savedState);
-    }
-  },
-  watch: {
-    isPanelExpanded(newValue) {
-      // Save isPanelExpanded to localStorage
-      localStorage.setItem("isPanelExpanded", JSON.stringify(newValue));
     },
   },
 });
@@ -80,29 +46,12 @@ export default defineComponent({
   width: 300px;
   background: #f5f5f5;
   border-right: 1px solid #ddd;
-}
-
-.left-panel.collapsed {
-  width: 50px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.collapsed-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  white-space: nowrap;
-  font-size: 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .main-content {
   margin-left: 300px;
-}
-
-.collapsed + .main-content {
-  margin-left: 50px;
 }
 
 #app {

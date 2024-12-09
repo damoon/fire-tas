@@ -52,10 +52,9 @@ export interface ColumnVisibility {
 
 export interface Events {
   coastFire: boolean;
-  leanFire: boolean;
   fire: boolean;
-  fatFire: boolean;
-  retired: boolean;
+  retiredA: boolean;
+  retiredB: boolean;
   oneMillion: boolean;
   portfolioDeclining: boolean;
   supportLowerIncome: boolean;
@@ -64,7 +63,12 @@ export interface Events {
   averageDeathB: boolean;
 }
 
+export interface AdditionalExpenses {
+  [key: number]: number;
+}
 export interface YearlyDataRow {
+  savingsRate: number;
+  additionalExpenses: number;
   index: number;
   year: number;
   ageA: number;
@@ -76,6 +80,7 @@ export interface YearlyDataRow {
   earnings: number;
   investment: number;
   totalInvested: number;
+  withdrawalRate: number;
   grossPayout: number;
   netPayout: number;
   medianSalary: number;

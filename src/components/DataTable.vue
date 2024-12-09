@@ -33,8 +33,13 @@
       <tbody>
         <tr
           v-for="row in yearlyData.filter((row) => row.year > 2000)"
-          :key="row.year"
+          :key="row.index"
           :class="{
+            declining:
+              yearlyData[row.index - 2] &&
+              row.totalInvested <
+                yearlyData[row.index - 2].totalInvested *
+                  (1 + formData.general.inflation / 100),
             deficit:
               Math.round(row.income) < Math.round(row.expenses) ||
               row.totalInvested < 0,
@@ -67,6 +72,13 @@
           </td>
           <td v-show="columns.netPayout.visible">
             {{ formatCurrency(row.netPayout) }}
+          </td>
+          <td v-show="columns.savingsRate.visible">
+            {{
+              row.earnings > 0
+                ? ((row.investment / row.earnings) * 100).toFixed(1)
+                : "0"
+            }}
           </td>
           <td v-show="columns.medianSalary.visible">
             {{ formatCurrency(row.medianSalary) }}
@@ -116,6 +128,18 @@
           <td v-show="columns.expenses.visible">
             {{ formatCurrency(row.expenses) }}
           </td>
+          <td v-show="columns.additionalExpenses.visible">
+            <input
+              type="number"
+              :value="additionalExpenses[row.year] || 0"
+              @input="updateAdditionalExpenses(row.year, $event)"
+              class="additional-expenses-input"
+              step="1000"
+            />
+          </td>
+          <td v-show="columns.withdrawalRate.visible">
+            {{ row.withdrawalRate.toFixed(2) }}
+          </td>
           <td v-show="columns.events.visible">
             {{
               Object.entries(row.events)
@@ -137,6 +161,8 @@ import type {
   Columns,
   YearlyDataRow,
   ColumnVisibility,
+  Events,
+  AdditionalExpenses,
 } from "@/types";
 import { calculateTaxableRate, grossToNetRetired } from "./taxes";
 
@@ -153,6 +179,7 @@ export default defineComponent({
   data() {
     return {
       currentView: "Zeit",
+      additionalExpenses: {} as AdditionalExpenses,
       views: [
         {
           name: "Zeit",
@@ -173,9 +200,11 @@ export default defineComponent({
             "year",
             "earnings",
             "investment",
+            "savingsRate",
             "totalInvested",
             "grossPayout",
             "netPayout",
+            "withdrawalRate",
           ],
         },
         {
@@ -218,6 +247,7 @@ export default defineComponent({
             "retirementNet",
             "income",
             "expenses",
+            "additionalExpenses",
             "events",
           ],
         },
@@ -235,6 +265,7 @@ export default defineComponent({
         totalInvested: true,
         grossPayout: true,
         netPayout: true,
+        savingsRate: true,
         medianSalary: true,
         grossA: true,
         grossB: true,
@@ -250,13 +281,26 @@ export default defineComponent({
         companyPensionB: true,
         retirementNet: true,
         income: true,
-        events: true,
         expenses: true,
+        withdrawalRate: true,
+        events: true,
+        additionalExpenses: true,
       } as ColumnVisibility,
     };
   },
-
   methods: {
+    updateAdditionalExpenses(year: number, event: Event): void {
+      const value = Number((event.target as HTMLInputElement).value) || 0;
+      this.additionalExpenses[year] = value;
+      localStorage.setItem(
+        "additionalExpenses",
+        JSON.stringify(this.additionalExpenses),
+      );
+    },
+    getTotalExpenses(baseExpenses: number, year: number): number {
+      const additionalExpense = this.additionalExpenses[year] || 0;
+      return baseExpenses + additionalExpense;
+    },
     activateView(viewName: string): void {
       const view = this.views.find((v) => v.name === viewName);
       if (view) {
@@ -333,6 +377,10 @@ export default defineComponent({
           visible: this.columnVisibility.netPayout,
           label: "Auszahlungen",
         },
+        savingsRate: {
+          visible: this.columnVisibility.savingsRate,
+          label: "Sparquote (%)",
+        },
         medianSalary: {
           visible: this.columnVisibility.medianSalary,
           label: "Mediangehalt",
@@ -390,11 +438,19 @@ export default defineComponent({
           label: "Altersrente Netto",
         },
         income: { visible: this.columnVisibility.income, label: "Einnahmen" },
-        events: { visible: this.columnVisibility.events, label: "Events" },
         expenses: {
           visible: this.columnVisibility.expenses,
           label: "Ausgaben",
         },
+        additionalExpenses: {
+          visible: this.columnVisibility.additionalExpenses,
+          label: "Zusätzliche Ausgaben",
+        },
+        withdrawalRate: {
+          visible: this.columnVisibility.withdrawalRate,
+          label: "Entnahmequote (%)",
+        },
+        events: { visible: this.columnVisibility.events, label: "Events" },
       };
     },
     yearlyData(): YearlyDataRow[] {
@@ -473,17 +529,19 @@ export default defineComponent({
           earnings += this.formData.personB.net * salaryIncreaseFactor;
         }
 
-        const expenses = this.formData.household.expenses * inflationFactor;
+        const additionalExpense = this.additionalExpenses[year] || 0;
+        const expenses =
+          this.formData.household.expenses * inflationFactor +
+          additionalExpense * inflationFactor;
 
-        const currentMonth = new Date().getMonth() + 1;
-        const remainingYearFactor = (12 - currentMonth) / 12;
         let investment = earnings - expenses;
-        const originalInvestment = investment;
-        if (index === 1) {
-          investment = investment * remainingYearFactor;
-        }
         if (year >= coastYear || investment < 0) {
           investment = 0;
+        }
+        if (index === 1) {
+          const currentMonth = new Date().getMonth() + 1;
+          const remainingYearFactor = currentMonth / 12;
+          totalInvested -= remainingYearFactor * investment;
         }
 
         const medianSalary =
@@ -559,10 +617,20 @@ export default defineComponent({
           totalInvested -= sequenceOrReturnRiskPremiumFactor * netPayout;
         }
 
-        const income =
-          netPayout + retirementNet + earnings - originalInvestment;
+        const income = netPayout + retirementNet + earnings - investment;
 
-        const events = {};
+        const events: Events = {
+          coastFire: false,
+          fire: false,
+          retiredA: false,
+          retiredB: false,
+          oneMillion: false,
+          portfolioDeclining: false,
+          supportLowerIncome: false,
+          supportHigherIncome: false,
+          averageDeathA: false,
+          averageDeathB: false,
+        };
         if (
           totalInvested > 1_000_000 &&
           !data.some((d) => d.events.oneMillion)
@@ -572,6 +640,19 @@ export default defineComponent({
         if (year == coastYear) {
           events.coastFire = true;
         }
+        if (year == fireYear) {
+          events.fire = true;
+        }
+        if (ageA == retirementAge) {
+          events.retiredA = true;
+        }
+        if (ageB == retirementAge) {
+          events.retiredB = true;
+        }
+
+        const withdrawalRate =
+          totalInvested > 0 ? (grossPayout / totalInvested) * 100 : 0;
+        const savingsRate = earnings > 0 ? (investment / earnings) * 100 : 0;
 
         data.push({
           index,
@@ -585,6 +666,7 @@ export default defineComponent({
           earnings,
           investment,
           totalInvested,
+          savingsRate,
           grossPayout,
           netPayout,
           medianSalary,
@@ -602,14 +684,22 @@ export default defineComponent({
           companyPensionA,
           companyPensionB,
           income,
+          additionalExpenses: this.additionalExpenses[year] || 0,
+          withdrawalRate,
           events,
         });
 
-        let investmentReturn =
-          (totalInvested * this.formData.general.expectedReturn) / 100;
+        let remainingYearFactor = 1;
         if (index === 1) {
-          investmentReturn = investmentReturn * remainingYearFactor;
+          const currentMonth = new Date().getMonth() + 1;
+          remainingYearFactor = 1 - currentMonth / 12;
         }
+
+        let investmentReturn =
+          (remainingYearFactor *
+            totalInvested *
+            this.formData.general.expectedReturn) /
+          100;
         totalInvested += investment + investmentReturn;
 
         index++;
@@ -634,6 +724,10 @@ export default defineComponent({
         ...this.columnVisibility,
         ...JSON.parse(savedVisibility),
       };
+    }
+    const savedAdditionalExpenses = localStorage.getItem("additionalExpenses");
+    if (savedAdditionalExpenses) {
+      this.additionalExpenses = JSON.parse(savedAdditionalExpenses);
     }
   },
 });
@@ -723,11 +817,27 @@ tr:hover {
   background-color: #f5f5f5;
 }
 
-tr.deficit {
+tr.declining {
   background-color: #ffcdd2;
+}
+
+tr.deficit {
+  background-color: #ffb9b9;
 }
 
 tr.deficit:hover {
   background-color: #ffebee;
+}
+.additional-expenses-input {
+  width: 100px;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: right;
+}
+
+.additional-expenses-input:focus {
+  outline: none;
+  border-color: #2c3e50;
 }
 </style>
