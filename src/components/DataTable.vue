@@ -1,15 +1,16 @@
 <template>
-  <div class="view-toggles">
-    <button
-      v-for="view in views"
-      :key="view.name"
-      @click="activateView(view.name)"
-      :class="{ active: currentView === view.name }"
-    >
-      {{ view.name }}
-    </button>
-  </div>
   <div class="table-container">
+    <div class="view-toggles">
+      <button
+        v-for="view in views"
+        :key="view.name"
+        @click="activateView(view.name)"
+        :class="{ active: currentView === view.name }"
+      >
+        {{ view.name }}
+      </button>
+    </div>
+
     <div class="column-toggles">
       <button
         v-for="(col, key) in columns"
@@ -32,17 +33,11 @@
       </thead>
       <tbody>
         <tr
-          v-for="row in yearlyData.filter((row) => row.year > 2000)"
+          v-for="row in yearlyData"
           :key="row.index"
           :class="{
-            declining:
-              yearlyData[row.index - 2] &&
-              row.totalInvested <
-                yearlyData[row.index - 2].totalInvested *
-                  (1 + formData.general.inflation / 100),
-            deficit:
-              Math.round(row.income) < Math.round(row.expenses) ||
-              row.totalInvested < 0,
+            declining: row.declining,
+            deficit: row.deficit,
           }"
         >
           <td v-show="columns.index.visible">{{ row.index }}</td>
@@ -64,6 +59,9 @@
           <td v-show="columns.investment.visible">
             {{ formatCurrency(row.investment) }}
           </td>
+          <td v-show="columns.yearlyReturn.visible">
+            {{ formatCurrency(row.yearlyReturn) }}
+          </td>
           <td v-show="columns.totalInvested.visible">
             {{ formatCurrency(row.totalInvested) }}
           </td>
@@ -79,6 +77,12 @@
                 ? ((row.investment / row.earnings) * 100).toFixed(1)
                 : "0"
             }}
+          </td>
+          <td v-show="columns.fourPercentRule.visible">
+            {{ formatCurrency(row.fourPercentRule) }}
+          </td>
+          <td v-show="columns.withdrawalRate.visible">
+            {{ row.withdrawalRate.toFixed(2) }}
           </td>
           <td v-show="columns.medianSalary.visible">
             {{ formatCurrency(row.medianSalary) }}
@@ -137,16 +141,14 @@
               step="1000"
             />
           </td>
-          <td v-show="columns.withdrawalRate.visible">
-            {{ row.withdrawalRate.toFixed(2) }}
-          </td>
-          <td v-show="columns.events.visible">
-            {{
-              Object.entries(row.events)
-                .filter(([_, value]) => value)
-                .map(([key]) => key)
-                .join(", ")
-            }}
+          <td v-show="columns.events.visible" class="events">
+            <div
+              v-for="event in Object.entries(row.events)
+                .filter(([key, value]) => value)
+                .map(([key]) => key)"
+            >
+              <span title="{{ event }}">{{ getEventEmoji(event) }}</span>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -200,11 +202,13 @@ export default defineComponent({
             "year",
             "earnings",
             "investment",
+            "yearlyReturn",
             "savingsRate",
+            "fourPercentRule",
+            "withdrawalRate",
             "totalInvested",
             "grossPayout",
             "netPayout",
-            "withdrawalRate",
           ],
         },
         {
@@ -266,6 +270,8 @@ export default defineComponent({
         grossPayout: true,
         netPayout: true,
         savingsRate: true,
+        fourPercentRule: true,
+        withdrawalRate: true,
         medianSalary: true,
         grossA: true,
         grossB: true,
@@ -282,8 +288,8 @@ export default defineComponent({
         retirementNet: true,
         income: true,
         expenses: true,
-        withdrawalRate: true,
         events: true,
+        yearlyReturn: true,
         additionalExpenses: true,
       } as ColumnVisibility,
     };
@@ -313,6 +319,10 @@ export default defineComponent({
           JSON.stringify(this.columnVisibility),
         );
         localStorage.setItem("tableViewName", viewName);
+        if (this.formData?.display?.minimizeTable) {
+          // Ensure events column is visible when table is minimized
+          this.columnVisibility.events = true;
+        }
       }
     },
     toggleColumn(columnKey: string): void {
@@ -329,6 +339,24 @@ export default defineComponent({
         style: "currency",
         currency: "EUR",
       });
+    },
+    getEventEmoji(eventName: string): string {
+      const emojiMap: { [key: string]: string } = {
+        coastFire: "☕", // Coast FIRE
+        retire: "🏖️", // Full Retirement
+        retiredA: "🧔‍♂️", // person A retired
+        retiredB: "👩", // person B retired
+        oneMillion: "💰", // total investments reaches 1M
+        twoMillion: "💰💰", // total investments reaches 2M
+        averageDeathA: "⚱️", // average lifespan of person A
+        averageDeathB: "⚱️", // average lifespan of person B
+        leanFire: "🔥", // Lean FIRE
+        fire: "🔥🔥", // regular FIRE
+        fatFire: "🔥🔥🔥", // Fat FIRE
+        returnsSupersedeInvestments: "🚀", // returns superseed investments
+        returnsSupersedeInvestmentsDouble: "🚀🚀", // double returns
+      };
+      return emojiMap[eventName] || "❓"; // returns question mark if event not found
     },
   },
 
@@ -365,6 +393,10 @@ export default defineComponent({
           visible: this.columnVisibility.investment,
           label: "Investieren",
         },
+        yearlyReturn: {
+          visible: this.columnVisibility.yearlyReturn,
+          label: "Rendite",
+        },
         totalInvested: {
           visible: this.columnVisibility.totalInvested,
           label: "Aktiendepot",
@@ -380,6 +412,14 @@ export default defineComponent({
         savingsRate: {
           visible: this.columnVisibility.savingsRate,
           label: "Sparquote (%)",
+        },
+        fourPercentRule: {
+          visible: this.columnVisibility.fourPercentRule,
+          label: "4% Regel",
+        },
+        withdrawalRate: {
+          visible: this.columnVisibility.withdrawalRate,
+          label: "Entnahmequote (%)",
         },
         medianSalary: {
           visible: this.columnVisibility.medianSalary,
@@ -446,10 +486,6 @@ export default defineComponent({
           visible: this.columnVisibility.additionalExpenses,
           label: "Zusätzliche Ausgaben",
         },
-        withdrawalRate: {
-          visible: this.columnVisibility.withdrawalRate,
-          label: "Entnahmequote (%)",
-        },
         events: { visible: this.columnVisibility.events, label: "Events" },
       };
     },
@@ -477,7 +513,9 @@ export default defineComponent({
       // }
       const taxableRate = calculateTaxableRate(retirementYear);
 
-      let totalInvested = this.formData.household.currentInvestments;
+      let totalInvested =
+        this.formData.household.currentInvestments *
+        (15 / this.formData.general.globalPE);
       const data: YearlyDataRow[] = [];
       let index = 1;
 
@@ -619,17 +657,38 @@ export default defineComponent({
 
         const income = netPayout + retirementNet + earnings - investment;
 
+        const fourPercentRule =
+          totalInvested * 0.04 * (1 - this.formData.general.returnTax / 100);
+
+        const withdrawalRate =
+          totalInvested > 0 ? (grossPayout / totalInvested) * 100 : 0;
+        const savingsRate = earnings > 0 ? (investment / earnings) * 100 : 0;
+
+        let remainingYearFactor = 1;
+        if (index === 1) {
+          const currentMonth = new Date().getMonth() + 1;
+          remainingYearFactor = 1 - currentMonth / 12;
+        }
+        const yearlyReturn =
+          (remainingYearFactor *
+            totalInvested *
+            this.formData.general.expectedReturn) /
+          100;
+
         const events: Events = {
           coastFire: false,
-          fire: false,
+          retire: false,
           retiredA: false,
           retiredB: false,
           oneMillion: false,
-          portfolioDeclining: false,
-          supportLowerIncome: false,
-          supportHigherIncome: false,
+          twoMillion: false,
           averageDeathA: false,
           averageDeathB: false,
+          leanFire: false,
+          fire: false,
+          fatFire: false,
+          returnsSupersedeInvestments: false,
+          returnsSupersedeInvestmentsDouble: false,
         };
         if (
           totalInvested > 1_000_000 &&
@@ -637,11 +696,17 @@ export default defineComponent({
         ) {
           events.oneMillion = true;
         }
+        if (
+          totalInvested > 2_000_000 &&
+          !data.some((d) => d.events.twoMillion)
+        ) {
+          events.twoMillion = true;
+        }
         if (year == coastYear) {
           events.coastFire = true;
         }
         if (year == fireYear) {
-          events.fire = true;
+          events.retire = true;
         }
         if (ageA == retirementAge) {
           events.retiredA = true;
@@ -649,10 +714,47 @@ export default defineComponent({
         if (ageB == retirementAge) {
           events.retiredB = true;
         }
+        if (
+          fourPercentRule + retirementNet >= higherExpenses &&
+          !data.some((d) => d.events.leanFire)
+        ) {
+          events.leanFire = true;
+        }
+        if (
+          fourPercentRule + retirementNet >= higherExpenses * 2 &&
+          !data.some((d) => d.events.fire)
+        ) {
+          events.fire = true;
+        }
+        if (
+          fourPercentRule + retirementNet >= higherExpenses * 4 &&
+          !data.some((d) => d.events.fatFire)
+        ) {
+          events.fatFire = true;
+        }
+        if (
+          yearlyReturn >= investment &&
+          investment > 0 &&
+          !data.some((d) => d.events.returnsSupersedeInvestments)
+        ) {
+          events.returnsSupersedeInvestments = true;
+        }
+        if (
+          yearlyReturn >= investment * 2 &&
+          investment > 0 &&
+          !data.some((d) => d.events.returnsSupersedeInvestmentsDouble)
+        ) {
+          events.returnsSupersedeInvestmentsDouble = true;
+        }
 
-        const withdrawalRate =
-          totalInvested > 0 ? (grossPayout / totalInvested) * 100 : 0;
-        const savingsRate = earnings > 0 ? (investment / earnings) * 100 : 0;
+        const declining =
+          index > 1 &&
+          totalInvested <
+            data[data.length - 1]?.totalInvested *
+              (1 + this.formData.general.inflation / 100);
+
+        const deficit =
+          Math.round(income) < Math.round(higherExpenses) || totalInvested < 0;
 
         data.push({
           index,
@@ -686,23 +788,29 @@ export default defineComponent({
           income,
           additionalExpenses: this.additionalExpenses[year] || 0,
           withdrawalRate,
+          fourPercentRule,
+          yearlyReturn,
+          declining,
+          deficit,
           events,
         });
 
-        let remainingYearFactor = 1;
-        if (index === 1) {
-          const currentMonth = new Date().getMonth() + 1;
-          remainingYearFactor = 1 - currentMonth / 12;
-        }
-
-        let investmentReturn =
-          (remainingYearFactor *
-            totalInvested *
-            this.formData.general.expectedReturn) /
-          100;
-        totalInvested += investment + investmentReturn;
+        totalInvested += investment + yearlyReturn;
 
         index++;
+      }
+
+      if (this.formData?.display?.minimizeTable) {
+        // Ensure events column is visible when table is minimized
+        this.columnVisibility.events = true;
+
+        return data
+          .filter((row) => row.year > 2000)
+          .filter(
+            (row, index) =>
+              index === 0 || // First row
+              Object.values(row.events).some((event) => event), // Rows with events
+          );
       }
 
       return data;
@@ -756,10 +864,9 @@ export default defineComponent({
 }
 
 .table-container {
-  margin-top: 20px;
-  overflow-x: auto;
+  margin: 20px auto;
   max-width: 1400px;
-  margin: 0 auto;
+  position: relative;
 }
 
 .column-toggles {
@@ -792,7 +899,8 @@ export default defineComponent({
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 0 auto;
   max-width: 1400px;
 }
@@ -804,9 +912,20 @@ td {
   border-bottom: 1px solid #ddd;
 }
 
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: white;
+}
+
 th {
   background-color: #f5f5f5;
   font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
 tr:nth-child(even) {
@@ -839,5 +958,13 @@ tr.deficit:hover {
 .additional-expenses-input:focus {
   outline: none;
   border-color: #2c3e50;
+}
+
+/* Event cell styling */
+.events div {
+  line-height: 1.5;
+}
+.events span {
+  white-space: nowrap;
 }
 </style>

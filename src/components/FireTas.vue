@@ -72,6 +72,15 @@
         <label>Steuern auf Rendite (%)</label>
         <input type="number" v-model="formData.general.returnTax" step="0.1" />
       </div>
+      <div class="input-group">
+        <label>Globales KGV</label>
+        <input
+          type="number"
+          v-model="formData.general.globalPE"
+          step="0.1"
+          min="0"
+        />
+      </div>
     </div>
   </section>
 
@@ -218,6 +227,19 @@
       </div>
     </div>
   </section>
+
+  <!-- Display Section -->
+  <section class="form-section">
+    <h2 @click="toggleSection('display')" class="toggle-header">
+      Darstellung {{ sectionStates.display ? "▼" : "►" }}
+    </h2>
+    <div v-show="sectionStates.display">
+      <div class="input-group">
+        <label>Tabelle minimieren</label>
+        <input type="checkbox" v-model="formData.display.minimizeTable" />
+      </div>
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -238,6 +260,7 @@ export default defineComponent({
         personA: false,
         personB: false,
         household: false,
+        display: false,
       },
       formData: {
         general: {
@@ -250,6 +273,7 @@ export default defineComponent({
           retirementAge: 67,
           expectedReturn: 7,
           returnTax: 18.375,
+          globalPE: 20,
         },
         personA: {
           name: "Person A",
@@ -278,6 +302,9 @@ export default defineComponent({
           childsAge: 2,
           currentInvestments: 100000,
         },
+        display: {
+          minimizeTable: false,
+        },
       } as FormData,
     };
   },
@@ -295,7 +322,7 @@ export default defineComponent({
     },
   },
 
-  mounted(): void {
+  created(): void {
     const savedSections = localStorage.getItem("sectionStates");
     if (savedSections) {
       this.sectionStates = JSON.parse(savedSections);

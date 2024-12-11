@@ -8,6 +8,7 @@ export interface GeneralData {
   retirementAge: number;
   expectedReturn: number;
   returnTax: number;
+  globalPE: number;
 }
 
 export interface PersonData {
@@ -30,11 +31,16 @@ export interface HouseholdData {
   currentInvestments: number;
 }
 
+export interface DisplayData {
+  minimizeTable: boolean;
+}
+
 export interface FormData {
   general: GeneralData;
   personA: PersonData;
   personB: PersonData;
   household: HouseholdData;
+  display: DisplayData;
 }
 
 export interface Column {
@@ -52,21 +58,26 @@ export interface ColumnVisibility {
 
 export interface Events {
   coastFire: boolean;
-  fire: boolean;
+  retire: boolean;
   retiredA: boolean;
   retiredB: boolean;
   oneMillion: boolean;
-  portfolioDeclining: boolean;
-  supportLowerIncome: boolean;
-  supportHigherIncome: boolean;
+  twoMillion: boolean;
   averageDeathA: boolean;
   averageDeathB: boolean;
+  leanFire: boolean;
+  fire: boolean;
+  fatFire: boolean;
+  returnsSupersedeInvestments: boolean;
+  returnsSupersedeInvestmentsDouble: boolean;
 }
 
 export interface AdditionalExpenses {
   [key: number]: number;
 }
 export interface YearlyDataRow {
+  declining: boolean;
+  deficit: boolean;
   savingsRate: number;
   additionalExpenses: number;
   index: number;
@@ -79,6 +90,7 @@ export interface YearlyDataRow {
   expenses: number;
   earnings: number;
   investment: number;
+  yearlyReturn: number;
   totalInvested: number;
   withdrawalRate: number;
   grossPayout: number;
@@ -98,5 +110,6 @@ export interface YearlyDataRow {
   companyPensionA: number;
   companyPensionB: number;
   income: number;
+  fourPercentRule: number;
   events: Events;
 }

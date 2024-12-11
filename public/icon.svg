@@ -1,16 +1,5 @@
 <svg width="500px" height="500px" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!--defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&amp;display=swap');
-    </style>
-  </defs -->
   <circle cx="250" cy="250" r="250" fill="#2c3e50"/>
   <circle cx="250" cy="250" r="167" fill="#fff"/>
   <circle cx="250" cy="250" r="83" fill="#2c3e50"/>
-  <!--text x="250" y="160" font-size="230" text-anchor="middle" fill="white" dominant-baseline="central" font-family="Space Grotesk">
-    fire
-  </text>
-  <text x="250" y="330" font-size="230" text-anchor="middle" fill="white" dominant-baseline="central" font-family="Space Grotesk">
-    tas
-  </text -->
 </svg>
