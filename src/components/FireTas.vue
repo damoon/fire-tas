@@ -77,7 +77,7 @@
         <input
           type="number"
           v-model="formData.general.globalPE"
-          step="0.1"
+          step="1"
           min="0"
         />
       </div>
@@ -94,6 +94,13 @@
       <div class="input-group">
         <label>Name</label>
         <input type="text" v-model="formData.personA.name" />
+      </div>
+      <div class="input-group">
+        <label>Geschlecht</label>
+        <select v-model="formData.personA.gender">
+          <option value="male">Männlich</option>
+          <option value="female">Weiblich</option>
+        </select>
       </div>
       <div class="input-group">
         <label>Geburtsjahr</label>
@@ -136,6 +143,13 @@
       <div class="input-group">
         <label>Name</label>
         <input type="text" v-model="formData.personB.name" />
+      </div>
+      <div class="input-group">
+        <label>Geschlecht</label>
+        <select v-model="formData.personB.gender">
+          <option value="male">Männlich</option>
+          <option value="female">Weiblich</option>
+        </select>
       </div>
       <div class="input-group">
         <label>Geburtsjahr</label>
@@ -277,6 +291,7 @@ export default defineComponent({
         },
         personA: {
           name: "Person A",
+          gender: "male",
           birthYear: 1984,
           gross: 43142,
           net: 28774.5,
@@ -286,6 +301,7 @@ export default defineComponent({
         },
         personB: {
           name: "Person B",
+          gender: "female",
           birthYear: 1982,
           gross: 43142,
           net: 28774.5,

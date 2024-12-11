@@ -13,6 +13,7 @@ export interface GeneralData {
 
 export interface PersonData {
   name: string;
+  gender: "male" | "female";
   birthYear: number;
   gross: number;
   net: number;

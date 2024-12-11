@@ -167,6 +167,7 @@ import type {
   AdditionalExpenses,
 } from "@/types";
 import { calculateTaxableRate, grossToNetRetired } from "./taxes";
+import { getLifeExpectancy } from "./lifeExpectancy";
 
 export default defineComponent({
   name: "DataTable",
@@ -322,6 +323,14 @@ export default defineComponent({
         if (this.formData?.display?.minimizeTable) {
           // Ensure events column is visible when table is minimized
           this.columnVisibility.events = true;
+          // only make additional expenses visible if any additional expense exists
+          if (
+            Object.values(this.additionalExpenses).some(
+              (expense) => expense > 0,
+            )
+          ) {
+            this.columnVisibility.additionalExpenses = true;
+          }
         }
       }
     },
@@ -348,8 +357,8 @@ export default defineComponent({
         retiredB: "👩", // person B retired
         oneMillion: "💰", // total investments reaches 1M
         twoMillion: "💰💰", // total investments reaches 2M
-        averageDeathA: "⚱️", // average lifespan of person A
-        averageDeathB: "⚱️", // average lifespan of person B
+        averageDeathA: "⚰️", // average lifespan of person A
+        averageDeathB: "👻", // average lifespan of person B
         leanFire: "🔥", // Lean FIRE
         fire: "🔥🔥", // regular FIRE
         fatFire: "🔥🔥🔥", // Fat FIRE
@@ -534,6 +543,9 @@ export default defineComponent({
         (this.formData.personB.companyPension -
           this.formData.personB.currentCompanyPension) /
         (this.formData.general.retirementAge - ageB);
+
+      const currentAgeA = currentYear - birthYearA;
+      const currentAgeB = currentYear - birthYearB;
 
       for (let year = currentYear; year <= maxYear; year++) {
         const ageA = year - birthYearA;
@@ -747,6 +759,21 @@ export default defineComponent({
           events.returnsSupersedeInvestmentsDouble = true;
         }
 
+        if (
+          ageA ===
+            getLifeExpectancy(this.formData.personA.gender, currentAgeA) &&
+          !data.some((d) => d.events.averageDeathA)
+        ) {
+          events.averageDeathA = true;
+        }
+        if (
+          ageB ===
+            getLifeExpectancy(this.formData.personB.gender, currentAgeB) &&
+          !data.some((d) => d.events.averageDeathB)
+        ) {
+          events.averageDeathB = true;
+        }
+
         const declining =
           index > 1 &&
           totalInvested <
@@ -803,13 +830,20 @@ export default defineComponent({
       if (this.formData?.display?.minimizeTable) {
         // Ensure events column is visible when table is minimized
         this.columnVisibility.events = true;
+        // only make additional expenses visible if any additional expense exists
+        if (
+          Object.values(this.additionalExpenses).some((expense) => expense > 0)
+        ) {
+          this.columnVisibility.additionalExpenses = true;
+        }
 
         return data
           .filter((row) => row.year > 2000)
           .filter(
             (row, index) =>
               index === 0 || // First row
-              Object.values(row.events).some((event) => event), // Rows with events
+              Object.values(row.events).some((event) => event) || // Rows with events
+              row.additionalExpenses > 0, // Rows with additional expenses
           );
       }
 
