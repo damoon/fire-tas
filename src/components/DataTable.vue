@@ -146,8 +146,10 @@
               v-for="event in Object.entries(row.events)
                 .filter(([key, value]) => value)
                 .map(([key]) => key)"
+              :key="event"
+              :title="getEventTitle(event)"
             >
-              <span title="{{ event }}">{{ getEventEmoji(event) }}</span>
+              {{ getEventEmoji(event) }}
             </div>
           </td>
         </tr>
@@ -351,21 +353,40 @@ export default defineComponent({
     },
     getEventEmoji(eventName: string): string {
       const emojiMap: { [key: string]: string } = {
-        coastFire: "☕", // Coast FIRE
-        retire: "🏖️", // Full Retirement
-        retiredA: "🧔‍♂️", // person A retired
-        retiredB: "👩", // person B retired
-        oneMillion: "💰", // total investments reaches 1M
-        twoMillion: "💰💰", // total investments reaches 2M
-        averageDeathA: "⚰️", // average lifespan of person A
-        averageDeathB: "👻", // average lifespan of person B
-        leanFire: "🔥", // Lean FIRE
-        fire: "🔥🔥", // regular FIRE
-        fatFire: "🔥🔥🔥", // Fat FIRE
-        returnsSupersedeInvestments: "🚀", // returns superseed investments
-        returnsSupersedeInvestmentsDouble: "🚀🚀", // double returns
+        coastFire: "☕",
+        retire: "🏖️",
+        retiredA: "🧔‍♂️",
+        retiredB: "👩",
+        oneMillion: "💰",
+        twoMillion: "💰💰",
+        averageDeathA: "⚰️",
+        averageDeathB: "👻",
+        leanFire: "🔥",
+        fire: "🔥🔥",
+        fatFire: "🔥🔥🔥",
+        returnsSupersedeInvestments: "🚀",
+        returnsSupersedeInvestmentsDouble: "🚀🚀",
       };
-      return emojiMap[eventName] || "❓"; // returns question mark if event not found
+      return emojiMap[eventName] || "❓";
+    },
+    getEventTitle(eventName: string): string {
+      const titleMap: { [key: string]: string } = {
+        coastFire: "Coast FIRE erreicht",
+        retire: "Ruhestand erreicht",
+        retiredA: "Person A im Ruhestand",
+        retiredB: "Person B im Ruhestand",
+        oneMillion: "1 Million € Vermögen erreicht",
+        twoMillion: "2 Millionen € Vermögen erreicht",
+        averageDeathA: `Durchschnittliche Lebenserwartung von ${this.formData.personA.name}`,
+        averageDeathB: `Durchschnittliche Lebenserwartung von ${this.formData.personB.name}`,
+        leanFire: "Lean FIRE erreicht",
+        fire: "FIRE erreicht",
+        fatFire: "Fat FIRE erreicht",
+        returnsSupersedeInvestments: "Rendite übersteigt Sparrate",
+        returnsSupersedeInvestmentsDouble:
+          "Rendite übersteigt doppelte Sparrate",
+      };
+      return titleMap[eventName] || "Unbekanntes Ereignis";
     },
   },
 
@@ -659,7 +680,7 @@ export default defineComponent({
         const higherExpenses =
           year >= fireYear && year < retirementYear ? expenses * 1.5 : expenses;
         if (higherExpenses - retirementNet - earnings > 0) {
-          netPayout = higherExpenses - retirementNet + earnings - investment;
+          netPayout = higherExpenses - retirementNet - earnings - investment;
           grossPayout = netPayout / (1 - this.formData.general.returnTax / 100);
 
           const sequenceOrReturnRiskPremiumFactor =
