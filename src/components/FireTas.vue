@@ -40,11 +40,11 @@
         />
       </div>
       <div class="input-group">
-        <label>Mediangehalt 2023</label>
+        <label>Mediangehalt</label>
         <input type="number" v-model="formData.general.medianSalary" />
       </div>
       <div class="input-group">
-        <label>Rentenpunktwert 2023</label>
+        <label>Rentenpunktwert</label>
         <input type="number" v-model="formData.general.pensionPointValue" />
       </div>
       <div class="input-group">
@@ -282,12 +282,12 @@ export default defineComponent({
           salaryIncrease: 1.0,
           medianSalaryIncrease: 2.0,
           medianSalary: 50493,
-          pensionPointValue: 39.32,
+          pensionPointValue: 41.09,
           pensionRiskAdjustment: 70,
           retirementAge: 67,
           expectedReturn: 7,
           returnTax: 18.375,
-          globalPE: 20,
+          globalPE: 22,
         },
         personA: {
           name: "Person A",
