@@ -672,7 +672,7 @@ export default defineComponent({
               retirementGross + companyPensionA + companyPensionB,
               taxableRate,
             ).netPension *
-            (100 / this.formData.general.pensionRiskAdjustment);
+            (this.formData.general.pensionRiskAdjustment / 100);
         }
 
         let netPayout = 0;
