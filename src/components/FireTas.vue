@@ -48,6 +48,15 @@
         <input type="number" v-model="formData.general.pensionPointValue" />
       </div>
       <div class="input-group">
+        <label>Rentensteigerung (%)</label>
+        <input
+          type="number"
+          v-model="formData.general.pensionIncrease"
+          step="0.1"
+          min="0"
+        />
+      </div>
+      <div class="input-group">
         <label>Rentensicherheit (%)</label>
         <input
           type="number"
@@ -283,6 +292,7 @@ export default defineComponent({
           medianSalaryIncrease: 2.0,
           medianSalary: 50493,
           pensionPointValue: 41.09,
+          pensionIncrease: 1.7,
           pensionRiskAdjustment: 70,
           retirementAge: 67,
           expectedReturn: 7,

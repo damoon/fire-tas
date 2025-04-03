@@ -584,6 +584,10 @@ export default defineComponent({
           1 + this.formData.general.medianSalaryIncrease / 100,
           yearsSinceStart,
         );
+        const pensionIncreaseFactor = Math.pow(
+          1 + this.formData.general.pensionIncrease / 100,
+          yearsSinceStart,
+        );
 
         let earnings = 0;
         if (index + this.formData.household.childsAge <= 18) {
@@ -641,7 +645,7 @@ export default defineComponent({
           retirementPointsTotalA + retirementPointsTotalB;
 
         const retirementPointValue =
-          this.formData.general.pensionPointValue * medianSalaryIncreaseFactor;
+          this.formData.general.pensionPointValue * pensionIncreaseFactor;
         let retirementGross = 0;
         if (ageA >= retirementAge) {
           retirementGross += retirementPointValue * retirementPointsTotalA * 12;

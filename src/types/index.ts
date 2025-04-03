@@ -4,6 +4,7 @@ export interface GeneralData {
   medianSalary: number;
   medianSalaryIncrease: number;
   pensionPointValue: number;
+  pensionIncrease: number;
   pensionRiskAdjustment: number;
   retirementAge: number;
   expectedReturn: number;
