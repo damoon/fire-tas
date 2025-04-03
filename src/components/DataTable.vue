@@ -641,6 +641,9 @@ export default defineComponent({
         if (year >= coastYear) {
           retirementPointsA = Math.min(retirementPointsA / 2, 0.5);
           retirementPointsB = Math.min(retirementPointsB / 2, 0.5);
+          const lowerRetirementPooints = Math.min(retirementPointsA, retirementPointsB);
+          retirementPointsA = lowerRetirementPooints;
+          retirementPointsB = lowerRetirementPooints;
         }
         const retirementPoints = retirementPointsA + retirementPointsB;
 
