@@ -225,11 +225,20 @@
         />
       </div>
       <div class="input-group">
-        <label>Coast Fire</label>
+        <label>Ausgaben (Coasting)</label>
+        <input
+          type="number"
+          v-model="formData.household.coastingExpenses"
+          min="0"
+          step="1000"
+        />
+      </div>
+      <div class="input-group">
+        <label>Coast Fire Age</label>
         <input type="number" v-model="formData.household.coastAge" />
       </div>
       <div class="input-group">
-        <label>Fire</label>
+        <label>Fire Age</label>
         <input type="number" v-model="formData.household.fireAge" />
       </div>
       <div class="input-group">
@@ -321,6 +330,7 @@ export default defineComponent({
         },
         household: {
           expenses: 36000,
+          coastingExpenses: 33000,
           coastAge: 55,
           fireAge: 64,
           sequenceOrReturnRiskPremium: 50,

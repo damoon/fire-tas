@@ -605,9 +605,14 @@ export default defineComponent({
         }
 
         const additionalExpense = this.additionalExpenses[year] || 0;
-        const expenses =
+        let expenses =
           this.formData.household.expenses * inflationFactor +
           additionalExpense * inflationFactor;
+        if (year >= coastYear || year > fireYear) {
+          expenses =
+            this.formData.household.coastingExpenses * inflationFactor +
+            additionalExpense * inflationFactor;
+        }
 
         let investment = earnings - expenses;
         if (year >= coastYear || investment < 0) {

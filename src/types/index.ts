@@ -25,6 +25,7 @@ export interface PersonData {
 
 export interface HouseholdData {
   expenses: number;
+  coastingExpenses: number;
   coastAge: number;
   fireAge: number;
   sequenceOrReturnRiskPremium: number;
