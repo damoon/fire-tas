@@ -597,11 +597,26 @@ export default defineComponent({
             12 *
             salaryIncreaseFactor;
         }
-        if (ageA < retirementAge && year < fireYear) {
-          earnings += this.formData.personA.net * salaryIncreaseFactor;
-        }
-        if (ageB < retirementAge && year < fireYear) {
-          earnings += this.formData.personB.net * salaryIncreaseFactor;
+        
+        // Calculate potential earnings for both individuals
+        const earningsA = this.formData.personA.net * salaryIncreaseFactor;
+        const earningsB = this.formData.personB.net * salaryIncreaseFactor;
+        
+        // During coasting period, only include earnings for the lower income person
+        if (year >= coastYear && year < fireYear) {
+          if (earningsA < earningsB) {
+            if (ageA < retirementAge) earnings += earningsA;
+          } else {
+            if (ageB < retirementAge) earnings += earningsB;
+          }
+        } else {
+          // Normal earnings calculation for non-coasting periods
+          if (ageA < retirementAge && year < fireYear) {
+            earnings += earningsA;
+          }
+          if (ageB < retirementAge && year < fireYear) {
+            earnings += earningsB;
+          }
         }
 
         const additionalExpense = this.additionalExpenses[year] || 0;
@@ -628,23 +643,28 @@ export default defineComponent({
           this.formData.general.medianSalary * medianSalaryIncreaseFactor;
 
         let grossA = this.formData.personA.gross * salaryIncreaseFactor;
+        let grossB = this.formData.personB.gross * salaryIncreaseFactor;
+
+        // Handle coasting period - set the higher of the two incomes to 0
+        if (year >= coastYear && year < fireYear) {
+          // Determine which person has the higher gross income
+          if (grossA > grossB) {
+            grossA = 0;
+          } else {
+            grossB = 0;
+          }
+        }
+
+        // Apply retirement/FIRE logic as before
         if (ageA >= retirementAge || year >= fireYear) {
           grossA = 0;
         }
-        let grossB = this.formData.personB.gross * salaryIncreaseFactor;
         if (ageB >= retirementAge || year >= fireYear) {
           grossB = 0;
         }
 
-        let retirementPointsA = grossA / medianSalary;
-        let retirementPointsB = grossB / medianSalary;
-        if (year >= coastYear) {
-          retirementPointsA = Math.min(retirementPointsA / 2, 0.5);
-          retirementPointsB = Math.min(retirementPointsB / 2, 0.5);
-          const lowerRetirementPooints = Math.min(retirementPointsA, retirementPointsB);
-          retirementPointsA = lowerRetirementPooints;
-          retirementPointsB = lowerRetirementPooints;
-        }
+        const retirementPointsA = grossA / medianSalary;
+        const retirementPointsB = grossB / medianSalary;
         const retirementPoints = retirementPointsA + retirementPointsB;
 
         retirementPointsTotalA += retirementPointsA;
