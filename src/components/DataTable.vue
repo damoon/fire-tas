@@ -40,7 +40,7 @@
             deficit: row.deficit,
           }"
         >
-          <td v-show="columns.index.visible">{{ row.index }}</td>
+          <td v-show="columns.index.visible">{{ row.index - 1 }}</td>
           <td v-show="columns.year.visible">{{ row.year }}</td>
           <td v-show="columns.ageA.visible">{{ row.ageA }}</td>
           <td v-show="columns.ageB.visible">{{ row.ageB }}</td>
